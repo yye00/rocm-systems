@@ -55,7 +55,7 @@ The canonical list lives in `src/include/plugin/nccl_tuner.h:27-41`:
 | **CollNet Direct** | `COLLNET_DIRECT=2` | `src/device/all_reduce.h:329` | In-network reduction (scatter/gather/reduce/bcast through a SHARP-capable switch/NIC) | AllReduce, AllGather, ReduceScatter |
 | **CollNet Chain** | `COLLNET_CHAIN=3` | `src/device/all_reduce.h:706` | Linear chain through the collective NIC | AllReduce |
 | **NVLS / NVLS-Tree** | `NVLS=4`, `NVLS_TREE=5` | `src/device/all_reduce.h:465`, `:598` | NVLink-SHARP fabric-memory multimem reduction; **NVIDIA-only**, inert on AMD HW | AllReduce, AllGather, ReduceScatter |
-| **PAT** (Parallel Aggregated Trees) | `PAT=6` | `src/device/all_gather.h:157`, `reduce_scatter.h` | Bruck-derived recursive-doubling tree; `log(p)` scaling for AllGather/ReduceScatter | AllGather, ReduceScatter |
+| **PAT** (Parallel Aggregated Trees) | `PAT=6` | `src/device/all_gather.h:157`, `reduce_scatter.h:189` | Recursive-doubling over aggregated trees, `log(p)` scaling (NVIDIA describes PAT as Bruck-based; the code itself says only "PAT"). Requires 1 GPU/node and host-side net — `tuning.cc:664-672`. Upstream NCCL, *not* AMD-specific | AllGather, ReduceScatter |
 
 **Cost model** (the function that ranks all of the above), `src/graph/tuning.cc:1121-1148`:
 
@@ -68,12 +68,21 @@ The canonical list lives in `src/include/plugin/nccl_tuner.h:27-41`:
 
 ### 1.3 AMD-specific algorithms (beyond stock NCCL)
 
-| Feature | File(s) | Mechanism | Gating |
+| Feature | File(s) | Mechanism | Gating (verified) |
 |---------|---------|-----------|--------|
-| **DDA** (Direct Data Access) one-shot/two-shot | `src/include/algorithms/*/​*_dda.h`, `CollCommon.h`, `src/dda_*_ipc.cu` | IPC peer pointers + GPU barrier; *flat* (one-shot all-to-all reduce) under a threshold, *tree* (two-shot RS+AG) above it | gfx942/gfx950, single node, `nRanks≥8`, `ncclSum`, fp32/fp16/bf16; `RCCL_DDA_*` |
-| **Pivot AllToAll** | `src/device/alltoall_pivot.h` | Multiple **bidirectional ring pairs** across an all-to-all-connected XGMI clique | `pivotA2AEnabled`, Rome model, >~750 KB/rank |
-| **Hierarchical AllGather** | `src/device/hierarchical_ag_shuffle.h`, `collectives.cc:171` | inter-node AG → intra-node AG → local shuffle kernel | `RCCL_HIERARCHICAL_ALLGATHER`, multi-node |
+| **DDA** (Direct Data Access) one-shot/two-shot, for AllReduce **+ ReduceScatter, AllGather, AllToAll** | `src/include/algorithms/*/*_dda.h`, `CollCommon.h`, `src/dda_*_ipc.cu` | IPC peer pointers + GPU barrier; *flat* (one-shot) under 256 KB, *tree* (two-shot RS+AG) above (`dda_all_reduce_ipc.cu:30-31`) | gfx942/gfx950, single node, **exactly 8 ranks** (`kDdaNranks=8`; the `nRanks<8` gate is loose but the eligibility fns require `==8`), not-in-group, not symmetric; fp32/fp16/bf16. **`ncclSum` only for AllReduce/ReduceScatter** (AllGather/AllToAll don't reduce). Threshold: **gfx942 fixed 4 MB (A2A) / 8 MB (AR,RS,AG)**; **gfx950 uses `RCCL_DDA_THRESHOLD`, default 64 MB** (`collectives.cc:134-144`, `:246/309/440/576`) |
+| **Pivot AllToAll** | `src/device/alltoall_pivot.h` | Multiple **bidirectional ring pairs** (self-chunk split by `pivot_direction`, `alltoall_pivot.h:24-50`) layered on a specific Rome topology | `pivotA2AEnabled` + `nChannels ≥ 2·pivotA2ANumBiRings` + per-rank ≥ **744 KB** (`744*1024`) + `rankAlign≠4`; **env opt-in, `RCCL_ALL_TO_ALL_PIVOT_ENABLE` defaults 0** (`collectives.cc:292`). Enabling preset is `rome_model_56` — a 16-GPU/4-NUMA topology, **not** a fully-connected clique |
+| **Hierarchical AllGather** | `src/device/hierarchical_ag_shuffle.h`, `collectives.cc:171` | inter-node AG → intra-node AG → local shuffle kernel | `RCCL_HIERARCHICAL_ALLGATHER` (default on) **and `nNodes ≥ 8`** and msg under a temp-buffer threshold (`rccl_wrap.cc:503`, `init.cc:2577`) |
 | **RocSHMEM GDA AllToAll(v)** | `src/device/alltoall_gda.h`, `alltoallv_gda.h` | GPU-initiated one-sided AllToAll over RocSHMEM | `ENABLE_ROCSHMEM`, size ≤ threshold |
+
+### 1.3a Additional algorithm paths outside the `NCCL_ALGO_*` enum (found in second-pass audit)
+
+The seven `NCCL_ALGO_*` values are not the whole story — several real device-kernel families dispatch outside that enum and are listed here for completeness:
+
+- **Symmetric-memory kernel family** — a *separate* enumeration `ncclSymkKernelId` (`src/include/sym_kernels.h:36-59`) with **17 kernels** in `src/device/symmetric/` covering AllReduce/AllGather/ReduceScatter via LL, load/store (LD/ST), **multicast (MC)**, **TMA**, and **Rail-optimized** (`RailRing_LsaSTMC`, `RailA2A_LsaLD`) variants. These are the NCCL "symmetric memory" (window-registered) collectives. The MC/TMA variants depend on NVIDIA multimem/TMA and are **largely inert on AMD** (like NVLS), but the family exists in-tree and is a distinct algorithmic path. *This was omitted from the first draft's inventory.*
+- **Direct / one-shot ReduceScatter** — `src/device/reduce_scatter.h:20-86`, gated by `work->enableDirectReduceScatter`; a batched `reduceCopy` from all ranks' temp buffers instead of the ring (reuses the RING enum slot).
+- **`oneRankReduce`** — `src/device/onerank.cu:24`, the single-rank special-case AllReduce/bias kernel.
+- **SendRecv (P2P) engine** — `src/device/sendrecv.h`; underpins the naive AllToAll (see 2.4) and all point-to-point.
 
 ### 1.4 Notable capability that was **removed**
 
@@ -93,7 +102,7 @@ There is no MSCCL interpreter directory in `src/` any longer. This matters for t
 
 **Why it may help and where RCCL falls short.** RCCL has two general AllReduce shapes: **Ring** (bandwidth-optimal data volume but `2(p-1)` serial dependency — latency grows linearly with rank count) and **Tree** (latency `~2·log(p)`). The RCCL cost model applies a `ratio *= .5` factor to Tree's bus bandwidth (`tuning.cc:858-861`), so on paper there is a medium-message / many-rank valley that Rabenseifner's `2·log₂(p)` steps at `~2n` (bandwidth-optimal) bytes would fill. Thakur, Rabenseifner & Gropp (2005) and Rabenseifner (2004) report exactly this as the method of choice for that regime in MPICH.
 
-> **Cross-check caveat (important).** RCCL's "Tree" is NVIDIA's **double-binary tree**, which in practice reaches **~95% of ring bandwidth** — it is *not* really a half-bandwidth algorithm; the `ratio *= .5` is a modeling convention for a single tree, and two complementary trees run together. So the theoretical "valley" that Rabenseifner fills is, in a well-tuned RCCL, **already substantially covered by the double-binary tree**. Rabenseifner's marginal benefit over a tuned tree is therefore *uncertain*, and it carries known GPU-side downsides (awkward non-power-of-2 handling; many small partner messages at late reduce-scatter steps). It is a genuine *missing algorithm* (no `NCCL_ALGO_*` exists), but it should be treated as a **candidate to benchmark**, not a guaranteed win.
+> **Cross-check caveat (important).** RCCL's "Tree" is a genuine **double-binary tree** — two complementary trees are built in `src/graph/trees.cc:89-110` (`ncclGetDtree`: base `ncclGetBtree` + mirror/shift). Vendor guidance reports the double-binary tree reaches **~95% of ring bandwidth** (an external performance figure, not derivable from the source); regardless of the exact number, it is *not* really a half-bandwidth algorithm — the `ratio *= .5` is a modeling convention for a single tree, and two complementary trees run together. So the theoretical "valley" that Rabenseifner fills is, in a well-tuned RCCL, **already substantially covered by the double-binary tree**. Rabenseifner's marginal benefit over a tuned tree is therefore *uncertain*, and it carries known GPU-side downsides (awkward non-power-of-2 handling; many small partner messages at late reduce-scatter steps). It is a genuine *missing algorithm* (no `NCCL_ALGO_*` exists), but it should be treated as a **candidate to benchmark**, not a guaranteed win.
 
 **AMD-specific nuance.** Within a single fully-connected XGMI clique (8× MI300, all-to-all links), Ring is already near-optimal and DDA covers the small/medium case — so RHD's intra-node value is modest. Any win is **inter-node / at the rail level**, and as a building block of the hierarchical decomposition in 2.2.
 
@@ -134,7 +143,9 @@ if (revBw) SUB_ROUND(revLink->bw, revBw);            // :117  reverse charged ON
 
 `revBw` is therefore **not** "the reverse bandwidth we forgot to use" — it is a **coupling penalty** applied *only* to hardware whose two directions are *not* independent (pre-Ampere NVSwitch, POWER9 NVLink). For PCIe/XGMI, `revBw` stays 0 precisely because those links **are full-duplex**: the two directions are modeled as independent, simultaneously-usable resources. In other words, **RCCL already assumes full-duplex PCIe** — the opposite of the earlier claim.
 
-**RCCL also already drives both directions at the schedule level.** A single unidirectional ring channel uses each link in one direction, but RCCL lays down **multiple channels including reverse-ordered rings**, and the **double-binary tree** (`all_reduce.h` Tree path) is the textbook construction for balancing traffic in *both* directions of every link (each rank is a leaf in one tree and internal in the other). NVIDIA/AMD's double-binary tree reaches ~95% of ring bandwidth for this reason. So the "pair a forward partial with a reverse partial so the link runs full-duplex" idea from the Panda work is, in substance, **already present**.
+**RCCL also already drives both directions at the schedule level.** A single unidirectional ring channel uses each link in one direction, but RCCL lays down **multiple channels including reverse-ordered rings**, and the **double-binary tree** (`trees.cc:89-110`) is the textbook construction for balancing traffic in *both* directions of every link (each rank is a leaf in one tree and internal in the other). So the "pair a forward partial with a reverse partial so the link runs full-duplex" idea from the Panda work is, in substance, **already present**.
+
+> **Framing precision (from the adversarial re-audit).** To be exact: RCCL does not "model full-duplex" as an added feature — its link representation is *inherently directional* (each `ncclTopoLink` carries one `bw` for one direction; a physical link is two separate objects created by two `ncclTopoConnectNodes` calls). Independence of the two directions is therefore the *default*, and the noteworthy logic is the opposite of a defect: the `revBw` code selectively *re-couples* the directions for hardware that is physically **not** full-duplex (pre-Ampere NVSwitch, POWER9 NVLink). Either way, the substantive conclusion stands — the PCIe reverse direction is not wasted.
 
 **What genuinely remains (narrow).** The Panda group's specific target — GPUs hanging off **PCIe switches with no XGMI/NVLink between them** (e.g. PCIe-only MI210 boxes, or older 4-GPU-per-switch servers) — benefits from *reduce-within-switch-first* staging so that a switch's shared uplink carries reduced (smaller) data rather than every GPU's full buffer. RCCL's topology search already *prefers* intra-switch paths and models shared-uplink contention (each path through a `PCI` switch→root link decrements that shared link's budget in `followPath`), so even this is partially covered. The residual opportunity is: make the *reduction order* explicitly switch-locality-aware on PCIe-only platforms — which is best pursued as a **special case of the hierarchical decomposition in 2.2**, not as a separate cost-model change.
 
@@ -253,20 +264,31 @@ Each item is independently shippable behind its own `RCCL_*` env gate, validated
 
 ---
 
-## Appendix — Verification note (code cross-check)
+## Appendix — Verification note (two rounds of code cross-check)
 
-Every load-bearing code claim in this document was re-read against the source on the surveyed checkout. Results:
+Every load-bearing claim in this document was re-read against the source. This was done twice: first a line-by-line author cross-check, then a **second-pass adversarial audit by four independent reviewers**, each instructed to *falsify* a non-overlapping cluster of claims by reading the actual code. Findings below.
 
-**Verified correct (Part 1 inventory):**
-- Algorithm/protocol enum values — `src/include/plugin/nccl_tuner.h:27-41` ✓
+**Verified correct (Part 1 inventory) — confirmed by both rounds:**
+- Algorithm/protocol enum: exactly 7 algos (`NCCL_ALGO_UNDEF=-1` sentinel aside), `NCCL_NUM_ALGORITHMS_V5=7` — `src/include/plugin/nccl_tuner.h:27-41`, `tuner_v5.h:19`; string table `init.cc:101` ✓
 - Cost-model formula `time = lat*latCount + nBytes/(1000*bw)` — `src/graph/tuning.cc:1148` ✓
-- Tree bus-bandwidth factor `ratio *= .5` (non-ring/NVLS) — `src/graph/tuning.cc:858-861` ✓
-- Device-kernel anchors — Ring `all_reduce.h:15`, `runTreeUpDown:110`, `runTreeSplit:183`, CollNet-Direct `:329`, NVLS `:465`, NVLS-Tree `:598`, CollNet-Chain `:706`; PAT `all_gather.h:157` / `reduce_scatter.h:189` ✓
-- DDA gating — `nRanks < 8` disabled, gfx942/gfx950 only, disabled in-group / under symmetric support, 64 MB default threshold — `src/collectives.cc:134-144`, `:128` ✓
-- MSCCL/MSCCL++ removed (API symbols now no-ops) — `docs/how-to/rccl-usage-tips.rst:19-20`, stubs in `nccl.h.in:1044+`; no `msccl` directory under `src/` ✓
+- Tree bus-bandwidth factor `ratio *= .5` (non-RING/NVLS/NVLS_TREE); RING/NVLS get `ratio *= nRanks/nsteps` — `src/graph/tuning.cc:858-861` ✓
+- All 9 device-kernel anchors exact — Ring `all_reduce.h:15`, `runTreeUpDown:110`, `runTreeSplit:183`, CollNet-Direct `:329`, NVLS `:465`, NVLS-Tree `:598`, CollNet-Chain `:706`; PAT `all_gather.h:157` / `reduce_scatter.h:189` ✓
+- Tree is a genuine **double-binary tree** — `src/graph/trees.cc:89-110` (`ncclGetDtree`) ✓
+- `PCI_BW = 12.0` — `topo.h:26` ✓
+- MSCCL/MSCCL++ removed and symbols verified **inert** (impls `WARN`+`return ncclSuccess`) — `src/misc/api_trace.cc:194-238`; docs `rccl-usage-tips.rst:19-20`; no `msccl/` dir ✓
 
-**Corrected (was wrong in the first draft):**
-- **The claimed "PCIe reverse-bandwidth cost-model defect" in `search.cc` does not exist.** `ncclTopoConnectNodes` (`topo.cc:172-197`) stores each link direction as an independent `ncclTopoLink` with its own `bw`; `followPath` (`search.cc:84-122`) decrements only the forward budget and charges reverse (`revBw`) **only** for coupled-direction hardware (pre-Ampere NVSwitch `:106`, POWER9 NVLink `:110`). PCIe/XGMI are therefore already modeled as **full-duplex**. Item #3 and its implementation guidance (Part 2.3, Part 3.3) were rewritten accordingly, and the priority ordering (Part 4) no longer leads with a non-existent fix.
-- Confidence levels and literature attributions were recalibrated: HiCCL's "17×" is over GPU-aware **MPI** (parity with RCCL/NCCL, not a win over them); the MVAPICH "1.59–2.45×" uses **multiple MPI processes per GPU** (not a like-for-like RCCL result); and RCCL's double-binary tree already reaches ~95% of ring bandwidth, which tempers the Rabenseifner (item #1) value proposition. All affected verdicts now say "benchmark before adopting."
+**All five "missing algorithm" claims — upheld (reviewers could not refute any):**
+- No recursive halving/doubling (Rabenseifner) AllReduce; no Swing; no Bruck anywhere; no hierarchical AllReduce (the hierarchical split-comms `comm.h:670-671` are wired to **AllGather only**, hard-checked `coll==ncclFuncAllGather`); cross-node AllToAll is a naive per-peer send/recv loop (`enqueue.cc:3597-3604`). ✓
 
-*Prepared by survey of the `develop` branch tree and corrected after a line-by-line code cross-check. Line numbers may drift as the branch advances.*
+**Corrected in round 1 (was wrong in the first draft):**
+- **The claimed "PCIe reverse-bandwidth cost-model defect" in `search.cc` does not exist.** Re-confirmed adversarially: `ncclTopoConnectNodes` (`topo.cc:172-197`) stores each link direction as a separate `ncclTopoLink` with its own `bw` (two calls per physical link, e.g. `topo.cc:626-627`); `followPath` (`search.cc:84-122`) decrements only the forward budget and charges reverse (`revBw`) **only** for coupled-direction hardware (`:104-107` pre-Ampere NVSwitch, `:108-111` POWER9 NVLink). PCIe reverse is not wasted; switch-uplink contention *is* modeled (shared switch→root link object). Item #3, Part 3.3, and Part 4 were rewritten.
+- Literature attributions recalibrated: HiCCL's "17×" is over GPU-aware **MPI** (parity with RCCL/NCCL); MVAPICH "1.59–2.45×" uses **multiple MPI processes per GPU** (not like-for-like); double-binary tree tempers the Rabenseifner case. The "~95% of ring bandwidth" is now labeled a **vendor-reported** figure, not code-derived.
+
+**Corrected in round 2 (precision errors caught by the adversarial reviewers):**
+- **Inventory completeness:** added the **symmetric-memory kernel family** (`ncclSymkKernelId`, 17 kernels, `sym_kernels.h:36-59`, `src/device/symmetric/`), **Direct/one-shot ReduceScatter** (`reduce_scatter.h:20-86`), and **`oneRankReduce`** (`onerank.cu:24`) — real algorithm paths outside the `NCCL_ALGO_*` enum omitted from the first draft (new §1.3a).
+- **DDA gating:** fires at **exactly 8 ranks** (`kDdaNranks=8`), not "≥8"; the **64 MB default is gfx950-only** (gfx942 uses fixed 4 MB A2A / 8 MB others); **`ncclSum` restriction is AllReduce/ReduceScatter only**. DDA also covers RS/AG/AllToAll, not just AllReduce.
+- **Pivot AllToAll:** threshold is **744 KB/rank** (`744*1024`, i.e. *below* 750 KB), it is **env opt-in (default off)**, and the enabling preset (`rome_model_56`) is a 16-GPU Rome topology, **not** a fully-connected clique.
+- **Hierarchical AllGather:** requires **`nNodes ≥ 8`**, not merely multi-node.
+- **PAT:** it is **upstream NCCL, not AMD-specific**, and "Bruck-derived" is an external attribution not present in the code — both softened.
+
+*Prepared by survey of the `develop` branch tree; corrected after a line-by-line author cross-check and a second-pass four-reviewer adversarial audit (independent Opus agents). Line numbers may drift as the branch advances.*
