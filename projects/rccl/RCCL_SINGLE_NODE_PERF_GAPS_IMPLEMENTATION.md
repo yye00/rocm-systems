@@ -10,7 +10,8 @@ The dominant, high-confidence, AMD-native opportunity is **inline low-precision 
 
 | Rank | Gap | Collective | Impact | Conf | Code Verdict | Key Citation |
 |---|---|---|---|---|---|---|
-| 1 | Inline block-quantized two-shot AllReduce (QuickReduce cluster: INT4/6/8/FP8 gfx942, native FP4/MXFP gfx950; incl. Flash Comm, MoRI-A2A, RCCLX-LP, EQuARX as sub-variants) | AllReduce (+A2A/AG/RS ext.) | H | H | ABSENT | ROCm Blogs 2025/2026 (QuickReduce); MSCCL++ ASPLOS'26 (peer-rev.) |
+| 1a | Inline block-quantized two-shot **AllReduce** (QuickReduce: INT4/6/8/FP8 gfx942, native FP4 gfx950; Flash Comm, EQuARX as sub-variants) — *lossy* | AllReduce | H* | H | ABSENT | ROCm Blogs 2025/2026 (QuickReduce); MSCCL++ ASPLOS'26 (peer-rev.) |
+| 1b | Quantized **MoE AllToAll** dispatch/combine (MoRI MXFP4/FP8, RCCLX-LP) — *separate kernel, per-token scales, no reduction* — *lossy* | AllToAll | H* | M–H | ABSENT | MoRI (ROCm/mori, 2026); RCCLX-LP (Meta, 2026) |
 | 2 | CPX/XCD/IOD chiplet-hierarchy-aware algo+proto selection (Tuner API dimension) | AR/AG/RS | H | H | PARTIAL | ROCm Blog 2025 (CPX RCCL Tuner) |
 | 3 | Generalized one-shot LD/ST + two-shot symmetric AR beyond DDA 8-rank/ncclSum/3-dtype limits | AR/RS/AG | M–H | H | PARTIAL | Demystifying NCCL, arXiv 2025 |
 | 4 | Log-round bandwidth-optimal RS/AllReduce (recursive-halving / circulant skips) | RS, AR | M | M | ABSENT | Träff, arXiv 2024 |
@@ -18,8 +19,41 @@ The dominant, high-confidence, AMD-native opportunity is **inline low-precision 
 | 6 | NCCLZ decoupled quantization + entropy-coded collectives | AR/AG/RS | L–M | L | ABSENT | NCCLZ arXiv 2026 (unverified) |
 | 7 | Multi-lane multi-process-per-GPU CPX-die-parallel AllReduce | AR | L–M | M | ABSENT | arXiv 2025 (MI300A) |
 | 8 | ForestColl / TE-CCL / TACCL synthesized bandwidth-optimal single-node schedules | AG/A2A/AR | L | M | ABSENT | ForestColl NSDI'26; TE-CCL SIGCOMM'24; TACCL NSDI'23 (peer-rev.) |
+| 9 | **Compute/comm overlap + collective-GEMM/epilogue fusion** (fuse residual/RMSNorm into AR epilogue; Domino-style chunk pipelining) — *lossless, added by audit* | AR/RS/AG | H | M | ABSENT | Domino arXiv 2409.15241 (FLUX 2406.06858 is NVIDIA-only) |
+| 10 | **Zero-copy user-buffer-registered intra-node reduction** (drop the DDA staging copy) — *lossless, added by audit* | AR/RS/AG | M | M | ABSENT | CTran/NCCLX zero-copy (arXiv 2510.20171), intra-node analog |
+| 11 | **Small-message (<~512 KB) latency-floor one-shot AllReduce** (band where QuickReduce loses; vLLM-CustomAllreduce target) — *lossless, added by audit* | AR (+Bcast/Reduce) | M | M | ABSENT/PARTIAL | vLLM CustomAllreduce; Demystifying NCCL arXiv 2507.04786 |
+
+\* **H\*** = high impact **only** for the accuracy-tolerant inference/TP slice; these gaps are *lossy* and must be off by default and never auto-selected on the exact-reduction path (see §1a.D). Ranks 9–11 were added by the independent audit (see §1a.E); Ranks 1a/1b are the split of the original Rank 1 (§1a.A).
 
 **Excluded after review:** NVLS/NVLS_TREE multimem, symmetric MC/TMA/STMC/LDMC paths, MSCCL++ SwitchChannel/2PA-Switch, MoRI inter-node RDMA path, contrib/nccl_ep Hopper/Blackwell-specific FP8 dispatch (marked NOT SUPPORTED, TMA/warp-specialized). All are NVIDIA-multimem/TMA-dependent or inter-node.
+
+---
+
+## 1a. Revisions from the independent three-auditor cross-check
+
+The ranked sections below (§2–§4) are the original workflow output with inline `[Corrected by audit]` fixes. This section adds the **structural** changes the audit recommended — apply these when scheduling work. (Audit outcome summary is in the appendix.)
+
+**A. Split Rank 1 — it merges two distinct implementable units.** The core merge (QuickReduce + Flash Comm + EQuARX = block-wise inline quant around a two-shot RS+AG AllReduce, differing only by codec) is legitimate. But it wrongly folds in **AllToAll**:
+- **Rank 1a — Quantized two-shot AllReduce** (QuickReduce/Flash/EQuARX): the strongest gap. One codec header + one kernel with a codec parameter. This is what the §3 Rank-1 plan actually builds. *Lossy* (see D).
+- **Rank 1b — Quantized MoE AllToAll dispatch/combine** (MoRI, RCCLX-LP): a **separate kernel and gap**. AllToAll does **not reduce** — the RS→reduce→AG machinery and `ncclSum` associativity are inapplicable; it is a permute/shuffle with **per-token (not per-block) scales** and **asymmetric precision** (MoRI: MXFP4 dispatch / FP8 combine). Do **not** treat it as covered by the Rank-1a plan or its 2–4-week estimate.
+- **Do not claim** FlashComm V2 outlier/bit-splitting or NCCLZ entropy coding are "covered" by the block-32 symmetric codec — they are optional codec variants requiring their own work (bit-splitting) or a separate stage (entropy, Rank 6).
+
+**B. Recommended implementation order is risk-adjusted, not raw-peak.** The §2 ordering is by peak speedup; for *scheduling*, prefer:
+1. **Rank 2 (CPX/XCD tuner)** as the **lead** — lossless, Medium effort, Low–Medium risk, the tuner scaffold already exists in `src/`, and it benefits *all* collectives. Best risk-adjusted first move.
+2. **Rank 1a (quantized AllReduce)** — highest peak, but *lossy* and Large effort (see D).
+3. **Rank 3 (DDA/symmetric generalization + LL128)** — lossless, moderate, widens an existing path.
+Then 1b, 5-(2PR only), 4, 6-8.
+
+**C. Re-rankings.**
+- **Demote Rank 4 (recursive-halving/circulant).** The companion survey (`RCCL_ALGORITHM_SURVEY_AND_IMPROVEMENTS.md` §2.1) concludes RHD's value is **inter-node**; at p=8 on a fully-connected XGMI clique the double-binary tree already fills the "valley" it targets. Keep it as a **low-priority, lossless** intra-node experiment, not a mid-table gap.
+- **Rank 5’s cited 3.8×/2.08× is non-additive.** Most of MSCCL++’s intra-node win is already captured by Rank 1a + existing DDA; only the **2PR (ring RS+AG with reduction/DMA overlap)** variant is genuinely new. Schedule *that specific variant*, and don’t double-count its headline multiplier on top of Rank 1a.
+
+**D. Weight lossiness as an impact discount, not just a risk note.** `ncclAllReduce` must return **exact** sums by default; Rank 1a/1b/6 are **lossy** and only addressable for the accuracy-tolerant inference/TP slice. Their "High impact" is real **only for that slice** — gate them off by default (`RCCL_QUICKREDUCE_ENABLE=0`) and never auto-select on the exact-reduction path.
+
+**E. Three gaps the report missed (add these).**
+- **Rank 9 — Compute/communication overlap + collective-GEMM/epilogue fusion** *(biggest omission)*. On a TP node, fuse the residual-add/RMSNorm into the AllReduce **epilogue** (removes an HBM round-trip) and pipeline collective against the adjacent GEMM (Domino-style chunking is portable; FLUX is CUTLASS/NVSHMEM-bound and excluded). This is orthogonal to — and larger than — any single faster collective. Citations: Domino (arXiv 2409.15241), FLUX (arXiv 2406.06858, NVIDIA-only). *Lossless.* Effort: Large; touches enqueue + device epilogue.
+- **Rank 10 — Zero-copy user-buffer-registered intra-node reduction.** DDA reduces through a staging scratch (`ddaIpcScratch`); a registered-user-buffer symmetric path that reduces **directly from model buffers** removes a copy — a pure intra-node bandwidth win. (Intra-node analog of the CTran/NCCLX zero-copy idea.) *Lossless.* Effort: Medium.
+- **Rank 11 — Small-message (<~512 KB) latency-floor one-shot AllReduce.** QuickReduce *loses* below its ~1 MB crossover; the latency-optimal one-shot path for that band is currently split across Rank 3 (LD/ST) and Rank 5 (1PA) and **owned by neither**. Make it a first-class gap (this is the band vLLM CustomAllreduce targets). *Lossless.* Effort: Medium. **Note:** Broadcast/Reduce, declared in-scope in §1, also lack dedicated gaps — fold them here or add as needed.
 
 ---
 
@@ -142,11 +176,11 @@ Rank = **single-node perf impact × research confidence × AMD viability**, hone
 
 ### Rank 6 — NCCLZ decoupled quantization + entropy-coded collectives
 
-**(a) What it is + citation.** Adds a compression layer that **decouples quantization from entropy coding** (lossless entropy coding on top of quantized values), pipelined separately, to shrink XGMI bytes/hop further than fixed block-quant. *NCCLZ: Compression-Enabled GPU Collectives with Decoupled Quantization and Entropy Coding* (arXiv 2605.12396, 2026 — **citation could not be verified; ID is anomalous**).
+**(a) What it is + citation.** Adds a compression layer that **decouples quantization from entropy coding** (lossless entropy coding on top of quantized values), pipelined separately, to shrink XGMI bytes/hop further than fixed block-quant. *NCCLZ: Compression-Enabled GPU Collectives with Decoupled Quantization and Entropy Coding* (arXiv 2605.12396, Stevens Institute, May 2026). **[Corrected by audit]** The paper is **real** and correctly cited — an earlier note calling the ID "anomalous/unverifiable" was wrong (2605 = 2026-05, a valid arXiv ID). The genuine caveat is **scope, not authenticity**: NCCLZ's headline is an **inter-node / bandwidth-limited** result, so its single-node/intra-node value is questionable — which is the real reason it sits at Rank 6.
 
-**Measured perf vs baseline.** Reports speedups from reduced bytes vs uncompressed NCCL collectives; **exact numbers not confirmed** (abstract-level only).
+**Measured perf vs baseline.** Reports **up to 9.65× over NCCL / 3.34× over prior compression libraries** — but in an **inter-node** setting where the network is the bottleneck; on a single fully-connected XGMI node (much higher intra-node bandwidth) the byte-reduction payoff is far smaller. Treat the 9.65× as **not applicable to single-node**.
 
-**(b) Code evidence (ABSENT).** Grep `NCCLZ|entropy|huffman|rANS|tANS|arithmetic.cod|codebook|bitpack` in `src/` → none. All `compress` hits are code-object/fatbin build flags (`CMakeLists.txt:856-857`, `src/device/Makefile:27`) or NIC CQE compression. `src/include/algorithms/` has only DDA subdirs.
+**(b) Code evidence (ABSENT).** Grep `NCCLZ|entropy|huffman|rANS|tANS|arithmetic.cod|codebook|bitpack` in `src/` → none. All `compress` hits are code-object/fatbin build flags (`CMakeLists.txt:140` `option(ENABLE_COMPRESS ...)` — *[corrected: the earlier `:856-857` reference was wrong; that file is 763 lines]*, `src/device/Makefile:27`) or NIC CQE compression. `src/include/algorithms/` holds collective-named subdirs (`all_reduce`, `all_gather`, `alltoall`, `reduce_scatter`) containing the DDA implementations.
 
 **(c) Implementation plan.** Build on Rank 1's codec: after block-quant, add an optional entropy stage (e.g. rANS) as a device pass in `src/include/algorithms/all_reduce/quick_reduce_codec.h`, pipelined via a second kernel phase. Gate `RCCL_QUICKREDUCE_ENTROPY`. Validate byte-reduction and net bus-BW on `all_reduce_perf` ≥16 MB. **Effort:** Large. **Risk:** High — entropy-coding on GPU has data-dependent throughput that can erase the byte savings; **lowest priority pending citation verification.**
 
@@ -156,7 +190,7 @@ Rank = **single-node perf impact × research confidence × AMD viability**, hone
 
 **(a) What it is + citation.** Assign multiple processes per GPU, each driving a separate comm "lane" over buffer partition s/PPG; in CPX mode each XCD is a logical GPU, exploiting die-locality; structured RS→lane-AR→AGv. *Optimizing Allreduce ... with Multiple Processes per GPU* (arXiv 2508.13397, 2025, preprint).
 
-**Measured perf vs baseline.** Up to **33× on MI300A CPX** (multi-lane + 2 PPG) vs **Cray MPICH MPI_Allreduce** — but baseline **lacks IPC** so is heavily inflated; 1.17× on MI300A SPX; measured on **MI300A APU, not MI300X** (XGMI-clique numbers would differ).
+**Measured perf vs baseline.** **[Corrected by audit]** The paper's abstract reports **up to ~3× over system MPI on Tuolumne (MI300A) and 2.45× on A100/Delta** — it does **not** contain the "33×" or "CPX/SPX 1.17×" figures an earlier draft attributed to it (those are unconfirmed and should be struck). Even the paper's real ~3× is vs an **IPC-less system-MPI baseline** on an **MI300A APU**, not an MI300X XGMI clique with IPC — so the gain over RCCL's existing IPC-capable DDA on a single MI300X/MI355X node is **unproven and likely small**.
 
 **(b) Code evidence (ABSENT).** CPX in `src/` is only topology parsing (`xml.h:22`, `xml.cc:434`). Grep `PPG|nProcsPerGpu|ranksPerGpu` → none. `isMultiRankGpu` (`src/include/comm.h:682`) is a permission gate that disables NVLS (`init.cc:1521-1533`); no lane/partition pipeline. Every `lane` token is a hardware warp lane.
 
@@ -180,15 +214,18 @@ Rank = **single-node perf impact × research confidence × AMD viability**, hone
 
 | Gap | Confidence | Why | Citation verification |
 |---|---|---|---|
-| Rank 1 QuickReduce cluster | **High** | Multiple ROCm-blog + open-source (mk1-project) measured single-node MI300X/MI355X results vs named RCCL baseline; MSCCL++ peer-reviewed anchor. AMD-native, no NVIDIA primitives. | ROCm blogs = engineering (not peer-reviewed) but reproducible/open-source. Sub-variants Flash Comm / EQuARX / FlashComm V2 are **NVIDIA-measured preprints** (down-weighted within cluster; ideas portable, need HIP port). MoRI intra-node path in-scope; RDMA path excluded. |
+| Rank 1 QuickReduce cluster | **High** | Multiple ROCm-blog + open-source (mk1-project) measured single-node MI300X/MI355X results vs named RCCL baseline; MSCCL++ peer-reviewed anchor. AMD-native, no NVIDIA primitives. FP4 gfx950-only / INT-codec gfx942 distinction **audit-verified correct** (LLVM PR #117794; native `v_cvt_scalef32_pk_fp4_f16` is CDNA4/gfx950 only). | ROCm blogs = engineering (not peer-reviewed) but reproducible/open-source. Sub-variants: **Flash Comm** = NVIDIA-measured preprint; **EQuARX** = **TPU/XLA** paper (int8 AR, 1.8× vs BF16 — *not* NVIDIA, corrected); **FlashComm V2** = any-bit/outlier-aware (its bit-splitting is **not** implemented by the Rank-1a block-32 plan — see split note). Ideas portable, need HIP port. |
 | Rank 2 CPX/XCD tuner | **High** | ROCm-blog measured 2–3.1× small-msg latency vs RCCL default; tuner scaffold already in `src/`. | Engineering blog, not peer-reviewed; bandwidth-tier numbers are AMD-published. |
 | Rank 3 Symmetric LD/ST + LL128 | **High** (code) / Med (perf transfer) | Kernels present in `src/device/symmetric/`; gap is LL128-in-symmetric + gate relaxation. | Perf numbers are **NVIDIA NVLink** (A100/H100); LL128 XGMI atomicity must be verified on gfx942/gfx950. |
 | Rank 4 Recursive-halving/circulant | **Medium** | Proven optimal in rounds/volume; **no GPU single-node number**. | **Preprint** (Träff arXiv 2024); author has related peer-reviewed work. |
 | Rank 5 MSCCL++ 1PA/2PA/2PR | **High** | Peer-reviewed (ASPLOS 2026), strong MI300X-vs-RCCL numbers; DDA covers a subset. | Verified peer-reviewed. Exclude SwitchChannel (NVSwitch multimem). |
-| Rank 6 NCCLZ | **Low** | Concept plausible but entropy-coding GPU throughput is data-dependent. | **Citation could not be verified** — arXiv ID 2605.12396 is anomalous (future-dated, non-standard); treat as unverified. Down-ranked accordingly. |
-| Rank 7 Multi-lane PPG | **Medium** | Real CPX mechanism, but 33× is baseline-inflated (MPICH lacks IPC) and **MI300A APU**, not MI300X. | Preprint; baseline not IPC-capable, so absolute numbers pessimistic/non-comparable. |
+| Rank 6 NCCLZ | **Low** (single-node) | Concept plausible but entropy-coding GPU throughput is data-dependent; and its headline is **inter-node** so intra-node value is small. | **Citation VERIFIED REAL** (audit corrected the earlier "anomalous ID" flag — arXiv 2605.12396 = 2026-05, valid; Stevens Institute; up to 9.65× over NCCL). Down-ranked for **inter-node scope**, not authenticity. |
+| Rank 7 Multi-lane PPG | **Low–Medium** | Real CPX mechanism, but the paper's **actual** number is ~3× (MI300A) / 2.45× (A100) vs IPC-less system MPI — the "33×" was a mis-citation (struck). | Preprint; baseline not IPC-capable and **MI300A APU** not MI300X; real gain over IPC-capable DDA unproven. |
 | Rank 8 ForestColl/TE-CCL/TACCL | **Medium** (research) / Low (single-node ROI) | All peer-reviewed; ForestColl tested on AMD MI250. But single-node ring is already near-optimal and executor was removed. | Verified peer-reviewed (NSDI'26 / SIGCOMM'24 / NSDI'23). Single-node factor for ForestColl not cleanly extractable from PDF. |
 
-**Flagged / could-not-verify:** NCCLZ citation (Rank 6) — anomalous arXiv ID, abstract-level only; do not schedule before confirming the paper exists and its single-node/intra-node applicability. Flash Communication, EQuARX, FlashComm V2 (within Rank 1) — measured on NVIDIA only; treated as portable *ideas* feeding the AMD-native QuickReduce codec, not standalone AMD-measured results.
+**Flagged (post-audit status):** NCCLZ (Rank 6) — citation is **real** (correction above); the flag is now *single-node applicability*, since its 9.65× is inter-node. Flash Communication / FlashComm V2 (Rank 1) — NVIDIA-measured; portable *ideas*, not AMD-measured. EQuARX — **TPU/XLA** (not NVIDIA). All Rank-1 sub-variants feed the AMD-native QuickReduce codec, which is the only *AMD-measured* result in the cluster.
+
+> ### Independent three-auditor cross-check — outcome
+> This report was re-audited by three independent agents (code/file-refs, citations/perf-numbers, scope/AMD-viability/ranking). **What held:** all 8 ABSENT/PARTIAL verdicts confirmed (each adversarially refute-tested); every `file:line` in Ranks 1–5,7,8 exact; **zero hallucinated citations** (all 15 works exist with correct IDs/venues/years); the **FP4 gfx950-vs-gfx942** distinction verified correct; the multi-lane baseline-inflation and preprint down-ranking judged sound. **What was corrected:** the NCCLZ "unverifiable" flag (paper is real; down-rank for inter-node scope), the multi-lane "33×" (paper says ~3×), EQuARX hardware (TPU not NVIDIA), and `CMakeLists.txt:856-857`→`:140`. **Structural revisions from the audit** are captured in §1a below (split Rank 1, re-rank guidance, three added gaps).
 
 **File references in this report were verified by reading the tree:** `src/dda_all_reduce_ipc.cu:31,55,133-163`, `src/include/algorithms/all_reduce/all_reduce_dda.h:21,43,56,76,90`, `src/include/algorithms/CollCommon.h:49,83,116`, `src/init.cc:101`, `src/graph/tuning.cc:858-861,1147-1148`, `src/collectives.cc:246,309,440-442,576`, `src/include/rccl_float8.h:71-149,381`, `src/nccl.h.in:593-596`, `src/sym_kernels.cc:152,429,460,486`, `src/plugin/tuner/csv_tuner.cc:44,57-59`, `src/include/rccl_common.h:63`, `src/device/symmetric/generate.py:106`, `tuner/rccl_tuner_gfx950.csv`, `src/misc/api_trace.cc:194-236` (all confirmed present).
