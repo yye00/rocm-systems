@@ -15,14 +15,14 @@ Five gaps stand out where the literature shows **large, repeatable** wins that R
 
 | # | Missing / weak capability | Published basis | Where it wins | Confidence |
 |---|---------------------------|-----------------|---------------|------------|
-| 1 | **Bandwidth-optimal recursive halving–doubling AllReduce** (Rabenseifner) as a first-class algorithm | Rabenseifner 2004; Thakur et al. 2005 | Medium messages, large rank counts, multi-node | High |
-| 2 | **Explicit multi-level (hierarchical) reduce-scatter → inter-node → all-gather decomposition** | BlueConnect (MLSys'19); HiCCL (IPDPS'25); MVAPICH multi-lane (2025) | Multi-node MI300/MI200; inter-node phase carries only 1/L of the data | High |
-| 3 | **Bidirectional, PCIe-tree-locality-aware scheduling** (the MVAPICH / D.K. Panda style) — drive *both* directions of each PCIe link concurrently | Panda group GPU-aware MPI; Faraji & Afsahi 2018 | PCIe-attached GPUs, GPU↔NIC paths, non-XGMI platforms | High |
-| 4 | **Staged / aggregated AllToAll** (Bruck for small, hierarchical aggregation for large) | Bruck 1997; Panda group hierarchical A2A (NSF'21) | MoE / expert-parallel small + medium AllToAll | Medium-High |
+| 1 | **Bandwidth-optimal recursive halving–doubling AllReduce** (Rabenseifner) as a first-class algorithm | Rabenseifner 2004; Thakur et al. 2005 | Medium messages, large rank counts, multi-node | Medium |
+| 2 | **Explicit multi-level (hierarchical) reduce-scatter → inter-node → all-gather decomposition** | BlueConnect (MLSys'19); HiCCL (IPDPS'25) | Multi-node MI300/MI200; inter-node phase carries only 1/L of the data | Medium-High |
+| 3 | **PCIe-switch-locality-aware hierarchical reduction** for PCIe-attached (non-XGMI) GPU platforms — *narrow residual of the MVAPICH / D.K. Panda direction* | Panda group GPU-aware MPI; Faraji & Afsahi 2018 | PCIe-only boxes (e.g. MI210/PCIe); niche on XGMI clusters | Low–Medium (see 2.3 — mostly already covered) |
+| 4 | **Staged / aggregated AllToAll** (Bruck for small, hierarchical aggregation for large) | Bruck 1997; Panda group hierarchical A2A (NSF'21) | MoE / expert-parallel small + medium inter-node AllToAll | Medium |
 | 5 | **Programmable execution-plan interpreter** (MSCCL/MSCCL++-style), now *removed* from RCCL | MSCCL/TACCL (ASPLOS'21, NSDI'22); MSCCL++ | Lets synthesized, topology-optimal schedules ship without a code change | Medium |
 | 6 | **Swing** bandwidth-optimal AllReduce for rail/torus inter-node fabrics | De Sensi et al., NSDI'24 | Large-scale torus / dragonfly / rail-optimized Ethernet | Medium (topology-gated) |
 
-The single most concrete and immediately actionable finding for the question you raised — *bidirectional PCIe tree exploitation, à la the former DK Panda / MVAPICH team* — is item **#3**, and it is backed by a specific defect in the current cost model documented in Part 2.3.
+> **Correction after code cross-check (see the verification note at the end):** an earlier draft of this document claimed item #3 was backed by a "cost-model defect" in which RCCL ignores the reverse direction of PCIe links. **That claim was wrong and has been removed.** On re-reading the code, RCCL already models each link direction as an *independent, full-bandwidth* resource (full-duplex), and already drives both directions via multi-channel mirrored rings and the double-binary tree. The core premise of the Panda "use the idle reverse PCIe direction" work is therefore *already largely satisfied* in RCCL; only a narrow residual remains (Part 2.3). The strongest genuinely-missing items are **#2 (hierarchical decomposition)** and, as a fresh algorithm, **#1 (Rabenseifner)** — with the caveats noted in their sections.
 
 ---
 
@@ -91,11 +91,13 @@ There is no MSCCL interpreter directory in `src/` any longer. This matters for t
 
 **What it is.** AllReduce = reduce-scatter (recursive *halving*: at step *s* a rank exchanges with a partner at distance `2^s`, sending `n/2^{s+1}` bytes) followed by all-gather (recursive *doubling*, mirror image). Total `2·log₂(p)` steps, exactly `2n·(p-1)/p ≈ 2n` bytes moved — the bandwidth lower bound — but with **logarithmic step count** instead of the ring's `2(p-1)`.
 
-**Why it helps and where RCCL falls short.** RCCL has only two general AllReduce shapes: **Ring** (bandwidth-optimal data volume but `2(p-1)` serial dependency — latency grows linearly with rank count) and **Tree** (latency-optimal `~2·log(p)` but the well-known ~50% bandwidth penalty baked into the model at `tuning.cc` via the `ratio *= .5` tree factor). The medium-message / many-rank regime — exactly where large-model training and multi-node inference live — is a valley between the two: too big for Tree's bandwidth penalty, too many ranks for Ring's latency. Rabenseifner fills that valley. Thakur, Rabenseifner & Gropp (2005) and the original Rabenseifner (2004) report it as the method of choice for that regime in MPICH; modern GPU re-derivations (e.g. arXiv 2508.13397, 2025) confirm `2·log p` step-count benefits hold on GPU fabrics.
+**Why it may help and where RCCL falls short.** RCCL has two general AllReduce shapes: **Ring** (bandwidth-optimal data volume but `2(p-1)` serial dependency — latency grows linearly with rank count) and **Tree** (latency `~2·log(p)`). The RCCL cost model applies a `ratio *= .5` factor to Tree's bus bandwidth (`tuning.cc:858-861`), so on paper there is a medium-message / many-rank valley that Rabenseifner's `2·log₂(p)` steps at `~2n` (bandwidth-optimal) bytes would fill. Thakur, Rabenseifner & Gropp (2005) and Rabenseifner (2004) report exactly this as the method of choice for that regime in MPICH.
 
-**AMD-specific nuance.** Within a single fully-connected XGMI clique (8× MI300, all-to-all links), Ring is already near-optimal and DDA covers the small/medium case — so RHD's intra-node value is modest. The win is **inter-node and at the rail level**, and as the building block of the hierarchical decomposition in 2.2.
+> **Cross-check caveat (important).** RCCL's "Tree" is NVIDIA's **double-binary tree**, which in practice reaches **~95% of ring bandwidth** — it is *not* really a half-bandwidth algorithm; the `ratio *= .5` is a modeling convention for a single tree, and two complementary trees run together. So the theoretical "valley" that Rabenseifner fills is, in a well-tuned RCCL, **already substantially covered by the double-binary tree**. Rabenseifner's marginal benefit over a tuned tree is therefore *uncertain*, and it carries known GPU-side downsides (awkward non-power-of-2 handling; many small partner messages at late reduce-scatter steps). It is a genuine *missing algorithm* (no `NCCL_ALGO_*` exists), but it should be treated as a **candidate to benchmark**, not a guaranteed win.
 
-**Verdict:** High confidence, clear gap (no `NCCL_ALGO_*` for it), well-trodden implementation path.
+**AMD-specific nuance.** Within a single fully-connected XGMI clique (8× MI300, all-to-all links), Ring is already near-optimal and DDA covers the small/medium case — so RHD's intra-node value is modest. Any win is **inter-node / at the rail level**, and as a building block of the hierarchical decomposition in 2.2.
+
+**Verdict:** Medium confidence. Clear *gap* (no enum for it) but competes head-to-head with the existing double-binary tree; adopt only if measured to beat it in the target regime.
 
 ### 2.2 Explicit multi-level hierarchical decomposition (BlueConnect / HiCCL / multi-lane)
 
@@ -107,33 +109,38 @@ AllReduce =  ReduceScatter(level 0) ∘ ReduceScatter(level 1) ∘ …
              ∘ AllGather(… ∘ AllGather(level 1) ∘ AllGather(level 0)
 ```
 
-Each level uses the algorithm/protocol best suited to *its* fabric, and — critically — **the slow inter-node phase only ever touches `1/(N₀·N₁·…)` of the buffer.** BlueConnect (Cho et al., MLSys'19) reported up to **87% reduction** in synchronization overhead on 192 GPUs for ResNet-50; HiCCL (Hidayetoglu et al., IPDPS'25) reports an average **17×** over GPU-aware MPI and parity-to-better than NCCL/RCCL by composing exactly these primitives with striping + pipelining; the MVAPICH "multi-lane" study (arXiv 2508.13397, 2025) measured **1.59–2.45×** on AMD MI300A (Tuolumne) and NVIDIA nodes for large buffers using precisely this intra-RS / inter-AR / intra-AG split.
+Each level uses the algorithm/protocol best suited to *its* fabric, and — critically — **the slow inter-node phase only ever touches `1/(N₀·N₁·…)` of the buffer.** BlueConnect (Cho et al., MLSys'19) reported up to **87% reduction** in synchronization overhead on 192 GPUs for ResNet-50 *versus the then-current baseline*; HiCCL (Hidayetoglu et al., IPDPS'25) reports an average **17× over GPU-aware MPI** and — importantly — only **parity-to-competitive with the vendor libraries (NCCL / RCCL / oneCCL)**, not a clear win over them, by composing these primitives with striping + pipelining.
 
-**Where RCCL falls short.** RCCL's Ring *implicitly* does a one-level intra/inter split (the ring threads a node's GPUs then hops the NIC), and the Hierarchical AllGather path (`hierarchical_ag_shuffle.h`) is a hand-rolled 2-level AllGather. But there is **no general, composable, bandwidth-minimizing decomposition for AllReduce** that guarantees the inter-node phase carries only `1/L` of the data, and no mechanism to *order* levels by fabric bandwidth. This is the highest-leverage structural improvement for multi-node MI300X/MI325 clusters.
+> **Attribution caveat (added after cross-check).** The "17×" is over GPU-aware *MPI*, **not** over RCCL. The MVAPICH "multi-lane" result (arXiv 2508.13397, 2025) that measured **1.59–2.45×** used **multiple MPI processes per GPU** — an MPI-runtime technique that does not map directly onto RCCL's single-process/multi-GPU model — so it is *motivating context*, not a like-for-like promise of RCCL speedup. The defensible claim is narrower: the *decomposition shape* (small inter-node phase) is sound and underlies these results, but the realized gain over an already-tuned RCCL Ring/Tree is unproven and must be measured.
 
-**Verdict:** High confidence. Largest practical multi-node win; reuses 2.1 as its top-level kernel.
+**Where RCCL falls short.** RCCL's Ring *implicitly* does a one-level intra/inter split (the ring threads a node's GPUs then hops the NIC), and the Hierarchical AllGather path (`hierarchical_ag_shuffle.h`) is a hand-rolled 2-level AllGather. But there is **no general, composable, bandwidth-minimizing decomposition for AllReduce** that guarantees the inter-node phase carries only `1/L` of the data, and no mechanism to *order* levels by fabric bandwidth. This is the most promising structural improvement for multi-node MI300X/MI325 clusters — but note RCCL's ring already recovers much of the benefit, so the upside is *incremental*, not the raw factors above.
 
-### 2.3 Bidirectional, PCIe-tree-locality-aware scheduling — the MVAPICH / D.K. Panda direction you raised
+**Verdict:** Medium-High confidence. Most promising multi-node structural change; reuses 2.1 as its top-level kernel. Requires A/B measurement against tuned Ring/Tree before adoption.
 
-This is the item most directly matching your example, and the survey found a **concrete, fixable defect** in the cost model.
+### 2.3 The MVAPICH / D.K. Panda "bidirectional PCIe tree" direction you raised — *mostly already covered*
 
-**The defect.** PCIe (and in general every non-NVLink/XGMI link) is treated as essentially **unidirectional** during path reservation. In `src/graph/search.cc:84-117` (`followPath`), reverse bandwidth `revBw` is only charged — and therefore only *modeled as usable* — for two narrow cases:
+This is the item that motivated your question. After cross-checking the code, the honest finding is that **RCCL already implements the core of what this line of work advocates**, so the earlier draft's "cost-model defect" framing was incorrect and has been removed. The detail matters, so here is the evidence.
+
+**Correcting the record.** The claim in the earlier draft — that PCIe is treated as *unidirectional* and the reverse direction is "wasted" — is **false**. In `src/graph/topo.cc:172-197` (`ncclTopoConnectNodes`), **each physical link direction is a separate `ncclTopoLink` object with its own independent `bw` budget** (a call adds `A→B`; the reverse `B→A` is a separate object created by a separate call). In `followPath` (`src/graph/search.cc:84-122`), reserving a path in the forward direction decrements **only** the forward link's budget:
 
 ```c
-// NVSwitch DEV node on pre-Ampere:           revBw += fwBw/8;   (search.cc:106)
-// POWER9 CPU NVLink:                          revBw += fwBw;     (search.cc:110)
-// everything else (incl. all PCIe): revBw stays 0  -> reverse direction is "free"/ignored
+float revBw = 0;                                    // search.cc:103  (starts at ZERO)
+if (link->remNode->type == DEV && ... < 80 && ...)  revBw += fwBw/8;  // :106  pre-Ampere NVSwitch
+if (link->remNode->type == CPU && ...POWER && NVL)  revBw += fwBw;    // :110  POWER9 NVLink
+...
+SUB_ROUND(link->bw, fwBw);                           // :116  forward budget only
+if (revBw) SUB_ROUND(revLink->bw, revBw);            // :117  reverse charged ONLY when coupled
 ```
 
-Consequently the search never *credits* a schedule for using the return direction of a PCIe link, and the algorithm builders never deliberately construct schedules that push distinct data **simultaneously up and down** the same PCIe switch port. Modern PCIe (Gen4/Gen5) and Infinity Fabric host links are **full-duplex** — a Gen5 x16 link sustains ~64 GB/s *each way concurrently*. Leaving the return path idle on the GPU↔switch and GPU↔NIC segments wastes up to half the available bisection on PCIe-attached platforms (e.g. MI210/PCIe boxes, and the GPU↔NIC leg on every platform).
+`revBw` is therefore **not** "the reverse bandwidth we forgot to use" — it is a **coupling penalty** applied *only* to hardware whose two directions are *not* independent (pre-Ampere NVSwitch, POWER9 NVLink). For PCIe/XGMI, `revBw` stays 0 precisely because those links **are full-duplex**: the two directions are modeled as independent, simultaneously-usable resources. In other words, **RCCL already assumes full-duplex PCIe** — the opposite of the earlier claim.
 
-**What the Panda/MVAPICH line of work does.** Their GPU-aware MPI collectives (Faraji & Afsahi, *Concurrency & Computation* 2018; the Ohio State MVAPICH2-GDR designs; their hierarchical large-message AllToAll, NSF'21) build the intra-node schedule from the **measured PCIe/NVLink tree**: GPUs under the same PCIe switch reduce locally first; each physical link is then driven in **both directions at once** by pairing a "forward" partial with a "reverse" partial (a bidirectional-ring / mirror-tree construction), so a Gen-N x16 link delivers its full bidirectional figure rather than half. The result is the staged "reduce within switch → exchange across switches → broadcast within switch" pattern, with every link bidirectionally saturated.
+**RCCL also already drives both directions at the schedule level.** A single unidirectional ring channel uses each link in one direction, but RCCL lays down **multiple channels including reverse-ordered rings**, and the **double-binary tree** (`all_reduce.h` Tree path) is the textbook construction for balancing traffic in *both* directions of every link (each rank is a leaf in one tree and internal in the other). NVIDIA/AMD's double-binary tree reaches ~95% of ring bandwidth for this reason. So the "pair a forward partial with a reverse partial so the link runs full-duplex" idea from the Panda work is, in substance, **already present**.
 
-**Where this plugs into RCCL.**
-- The topology already represents PCIe switches as `PCI` nodes and even flattens BCM two-level switches (`topo.cc:199-271`), so the **tree structure is available** — it just isn't exploited bidirectionally.
-- `search.cc` would need a `revBw` accounting path for `LINK_PCI`/`LINK_SYS` when the platform reports full-duplex, and the ring/tree builders (`connect.cc`, `trees.cc`, `rings.cc`) would need to emit **mirror pairs** that the device kernels run concurrently (the Tree split-thread mechanism in `all_reduce.h:183` and the Pivot bidirectional-ring kernel in `alltoall_pivot.h` are existing precedents for two-direction device code).
+**What genuinely remains (narrow).** The Panda group's specific target — GPUs hanging off **PCIe switches with no XGMI/NVLink between them** (e.g. PCIe-only MI210 boxes, or older 4-GPU-per-switch servers) — benefits from *reduce-within-switch-first* staging so that a switch's shared uplink carries reduced (smaller) data rather than every GPU's full buffer. RCCL's topology search already *prefers* intra-switch paths and models shared-uplink contention (each path through a `PCI` switch→root link decrements that shared link's budget in `followPath`), so even this is partially covered. The residual opportunity is: make the *reduction order* explicitly switch-locality-aware on PCIe-only platforms — which is best pursued as a **special case of the hierarchical decomposition in 2.2**, not as a separate cost-model change.
 
-**Verdict:** High confidence, *directly* your example, with a pinpointed code defect. Biggest gains on PCIe-attached and GPU↔NIC paths; smaller inside a fully-connected XGMI clique (where XGMI is already aggregated bidirectionally at `topo.cc:172-197`).
+**Where it plugs in (if pursued).** Add a PCIe-switch level to the level vector in 2.2 so the intra-switch reduce-scatter happens before crossing the switch uplink. No `search.cc` change is warranted — the reverse-bandwidth accounting is already correct.
+
+**Verdict:** Low–Medium confidence, and **only** on PCIe-attached (non-XGMI) platforms. On XGMI clusters (the mainstream MI250/MI300/MI325 training target) there is essentially nothing to gain here beyond what RCCL already does. This is the most important correction surfaced by the cross-check.
 
 ### 2.4 Staged / aggregated AllToAll (Bruck + hierarchical aggregation)
 
@@ -143,13 +150,13 @@ Consequently the search never *credits* a schedule for using the return directio
 
 **Where RCCL falls short.** RCCL already has the *all-to-all-connected XGMI* case covered by Pivot A2A (`alltoall_pivot.h`) and a RocSHMEM GDA path, but the **cross-node** AllToAll falls back to direct/ring. MoE / expert-parallel training (the dominant AllToAll consumer today) is exactly small-to-medium messages across many nodes — the regime Bruck and hierarchical aggregation target. Note the honest caveat from the literature (ICHPC-Asia'24, *Bruck Performance Analysis*): plain Bruck's intra-node multi-GPU benefit is muted; the **inter-node** and **aggregation** variants are where the win is.
 
-**Verdict:** Medium-high. Clear gap for inter-node MoE AllToAll; layer onto the existing Pivot/GDA paths rather than replacing them.
+**Verdict:** Medium. Real gap for inter-node MoE AllToAll; layer onto the existing Pivot/GDA paths rather than replacing them. Temper expectations with the ICHPC-Asia'24 caveat above — measure before enabling by default.
 
 ### 2.5 Restore a programmable execution-plan interpreter (MSCCL/MSCCL++-style)
 
 **What it is.** MSCCL (ASPLOS'21 / TACCL NSDI'22) and MSCCL++ execute a *data-driven schedule* — a per-(topology, size) program of send/recv/reduce steps synthesized offline (often optimally, via constraint solvers) — on a generic GPU interpreter kernel. This lets a vendor ship a *new* topology-tailored algorithm as a data file, with no library rebuild.
 
-**Where RCCL falls short.** This was explicitly **removed** (`rccl-usage-tips.rst:19`). The remaining extension point, the tuner plugin (`tuner_v6.h`), can only *choose among* Ring/Tree/CollNet/PAT and tweak channels/chunk size — it cannot express a new pattern. So every improvement in 2.1–2.4 currently requires a C++/HIP code change. Re-introducing an interpreter (or an MSCCL++-style executor) would let synthesized schedules — including Rabenseifner, hierarchical, and bidirectional-PCIe plans — be delivered and A/B-tested as data.
+**Where RCCL falls short.** This was explicitly **removed** (`rccl-usage-tips.rst:19`). The remaining extension point, the tuner plugin (`tuner_v6.h`), can only *choose among* Ring/Tree/CollNet/PAT and tweak channels/chunk size — it cannot express a new pattern. So every improvement in 2.1–2.4 currently requires a C++/HIP code change. Re-introducing an interpreter (or an MSCCL++-style executor) would let synthesized schedules — including Rabenseifner and hierarchical plans — be delivered and A/B-tested as data.
 
 **Verdict:** Medium. A force-multiplier rather than a point fix; reduces the cost of shipping 2.1–2.4 and future research.
 
@@ -189,14 +196,14 @@ General integration rules that apply to every new *algorithm* (2.1, 2.2, 2.6):
 - **Reuse:** generalize the existing `hierarchical_ag_shuffle.h` AllGather into the AG half of this pipeline.
 - **Effort:** ~4–6 kEng-weeks; highest multi-node payoff.
 
-### 3.3 Bidirectional PCIe-tree scheduling (your example)
+### 3.3 PCIe-switch-locality-aware reduction (narrow residual of the Panda direction)
 
-This can ship in two independently-valuable stages:
+> **Scope note:** as established in Part 2.3, RCCL already models PCIe as full-duplex and already uses both link directions (multi-channel mirrored rings + double-binary tree). **Do not** add reverse-bandwidth accounting to `followPath` — that would be wrong; the two directions are already independent budgets. There is *no* cost-model defect to fix.
 
-- **Stage A — model the return path (small, surgical).** In `src/graph/search.cc:84-117`, extend `followPath` to charge `revBw` for `LINK_PCI` and `LINK_SYS` when the platform advertises full-duplex (add a `fullDuplex` bit to the link during discovery in `topo.cc:172-197`, set from PCIe Gen and Infinity-Fabric capability). This alone lets the existing search *find* schedules that reserve both directions, improving channel counts on PCIe-attached and GPU↔NIC paths.
-- **Stage B — emit mirror schedules (the algorithmic part).** In the ring/tree builders (`rings.cc`, `trees.cc`, `connect.cc`), construct **bidirectional pairs**: for each PCIe-local group, build a forward ring and its mirror so each physical link carries a distinct partial in each direction. Run them concurrently on the device using the existing two-direction precedents — the Tree split-thread kernel (`all_reduce.h:183`) and the Pivot bidirectional-ring kernel (`alltoall_pivot.h`). Prioritize the **GPU↔NIC PCIe leg** first: it exists on *every* platform and currently runs half-duplex for collectives that don't overlap send/recv.
-- **Validation:** `tools/topo_expl/` can synthesize PCIe-switch tree models; compare reserved bisection before/after Stage A, then bus-bandwidth before/after Stage B on a PCIe-attached MI210 box and on the GPU↔NIC path of an MI300X node.
-- **Effort:** Stage A ~1 kEng-week; Stage B ~3–4 kEng-weeks.
+- **Only applies to PCIe-attached (non-XGMI) GPU platforms.** On XGMI clusters, skip this entirely.
+- **The change, if pursued:** treat the PCIe switch as an explicit level in the 3.2 level vector, so an intra-switch reduce-scatter runs *before* any GPU under the switch drives its buffer across the shared switch→root uplink. This shrinks the data crossing the (potentially oversubscribed) uplink to `1/(GPUs-per-switch)`.
+- **Validation:** `tools/topo_expl/` can synthesize PCIe-switch tree models; compare bus bandwidth on a PCIe-attached MI210 box with and without switch-level staging. Confirm no regression on XGMI systems (it should be a no-op there).
+- **Effort:** ~2 kEng-weeks *as an extension of 3.2* (not a standalone item).
 
 ### 3.4 Staged / aggregated inter-node AllToAll
 
@@ -219,14 +226,14 @@ This can ship in two independently-valuable stages:
 
 ## Part 4 — Recommended sequencing
 
-1. **3.3 Stage A** (model PCIe return path) — tiny, surgical, directly addresses the bidirectional-PCIe question, and benefits *all* algorithms by improving channel search. Do this first.
-2. **3.1 Rabenseifner RHD AllReduce** — low risk, reuses existing primitives, fills the medium-message valley.
-3. **3.2 Hierarchical AllReduce** — biggest multi-node win; uses 3.1 as its top level.
-4. **3.3 Stage B** (mirror bidirectional schedules) and **3.4 staged AllToAll** in parallel — both are device-kernel work with the Tree-split/Pivot precedents to copy from.
+1. **3.2 Hierarchical (multi-level) AllReduce** — the most promising genuinely-missing structural change for multi-node clusters. Build it first and *measure it against tuned Ring/Tree* to establish the real (incremental) upside before investing further.
+2. **3.4 Staged / aggregated inter-node AllToAll** — clearest independent win, targets MoE, doesn't overlap the AllReduce work.
+3. **3.1 Rabenseifner RHD AllReduce** — implement as a *benchmark candidate* (it competes with the existing double-binary tree; adopt only if it wins in the target regime). Reuses existing primitives, so cheap to prototype.
+4. **3.3 PCIe-switch-locality staging** — only if PCIe-attached (non-XGMI) platforms are a target; fold into 3.2.
 5. **3.5 plan interpreter** — strategic; unlocks data-driven delivery of everything above.
 6. **3.6 Swing** — when rail/torus inter-node fabrics become a priority.
 
-Each item is independently shippable behind its own `RCCL_*` env gate, validated with `rccl-tests` + `tools/topo_expl/`.
+Each item is independently shippable behind its own `RCCL_*` env gate, validated with `rccl-tests` + `tools/topo_expl/`. **No item should be adopted on theory alone** — every one above competes with an already-tuned RCCL path, so each needs an A/B benchmark in its target regime before it ships enabled-by-default.
 
 ---
 
@@ -246,4 +253,20 @@ Each item is independently shippable behind its own `RCCL_*` env gate, validated
 
 ---
 
-*Prepared by automated survey of the `develop` branch tree. Code citations verified against the surveyed checkout; line numbers may drift as the branch advances.*
+## Appendix — Verification note (code cross-check)
+
+Every load-bearing code claim in this document was re-read against the source on the surveyed checkout. Results:
+
+**Verified correct (Part 1 inventory):**
+- Algorithm/protocol enum values — `src/include/plugin/nccl_tuner.h:27-41` ✓
+- Cost-model formula `time = lat*latCount + nBytes/(1000*bw)` — `src/graph/tuning.cc:1148` ✓
+- Tree bus-bandwidth factor `ratio *= .5` (non-ring/NVLS) — `src/graph/tuning.cc:858-861` ✓
+- Device-kernel anchors — Ring `all_reduce.h:15`, `runTreeUpDown:110`, `runTreeSplit:183`, CollNet-Direct `:329`, NVLS `:465`, NVLS-Tree `:598`, CollNet-Chain `:706`; PAT `all_gather.h:157` / `reduce_scatter.h:189` ✓
+- DDA gating — `nRanks < 8` disabled, gfx942/gfx950 only, disabled in-group / under symmetric support, 64 MB default threshold — `src/collectives.cc:134-144`, `:128` ✓
+- MSCCL/MSCCL++ removed (API symbols now no-ops) — `docs/how-to/rccl-usage-tips.rst:19-20`, stubs in `nccl.h.in:1044+`; no `msccl` directory under `src/` ✓
+
+**Corrected (was wrong in the first draft):**
+- **The claimed "PCIe reverse-bandwidth cost-model defect" in `search.cc` does not exist.** `ncclTopoConnectNodes` (`topo.cc:172-197`) stores each link direction as an independent `ncclTopoLink` with its own `bw`; `followPath` (`search.cc:84-122`) decrements only the forward budget and charges reverse (`revBw`) **only** for coupled-direction hardware (pre-Ampere NVSwitch `:106`, POWER9 NVLink `:110`). PCIe/XGMI are therefore already modeled as **full-duplex**. Item #3 and its implementation guidance (Part 2.3, Part 3.3) were rewritten accordingly, and the priority ordering (Part 4) no longer leads with a non-existent fix.
+- Confidence levels and literature attributions were recalibrated: HiCCL's "17×" is over GPU-aware **MPI** (parity with RCCL/NCCL, not a win over them); the MVAPICH "1.59–2.45×" uses **multiple MPI processes per GPU** (not a like-for-like RCCL result); and RCCL's double-binary tree already reaches ~95% of ring bandwidth, which tempers the Rabenseifner (item #1) value proposition. All affected verdicts now say "benchmark before adopting."
+
+*Prepared by survey of the `develop` branch tree and corrected after a line-by-line code cross-check. Line numbers may drift as the branch advances.*
