@@ -11,16 +11,17 @@
 
 RCCL implements the standard NCCL algorithm set (Ring, double-binary Tree, CollNet Direct/Chain, NVLS / NVLS-Tree, PAT) plus a set of AMD-specific intra-node fast paths (DDA IPC one-/two-shot, Pivot AllToAll, Hierarchical AllGather, RocSHMEM GDA). The selection machinery is a latency + size/bandwidth cost model (`tuning.cc`) over a topology graph that explicitly models the PCIe/XGMI/NIC hierarchy (`topo.cc`, `paths.cc`, `search.cc`).
 
-Five gaps stand out where the literature shows **large, repeatable** wins that RCCL does not currently capture:
+Seven gaps stand out where the literature shows **large, repeatable** wins that RCCL does not currently capture (items 2, 4, 5 now carry direct on-AMD evidence added in a follow-up research pass — see the flagged validation notes in those sections and the companion doc `COLLECTIVE_COMM_STATE_OF_THE_ART_2026.md`):
 
 | # | Missing / weak capability | Published basis | Where it wins | Confidence |
 |---|---------------------------|-----------------|---------------|------------|
 | 1 | **Bandwidth-optimal recursive halving–doubling AllReduce** (Rabenseifner) as a first-class algorithm | Rabenseifner 2004; Thakur et al. 2005 | Medium messages, large rank counts, multi-node | Medium |
-| 2 | **Explicit multi-level (hierarchical) reduce-scatter → inter-node → all-gather decomposition** | BlueConnect (MLSys'19); HiCCL (IPDPS'25) | Multi-node MI300/MI200; inter-node phase carries only 1/L of the data | Medium-High |
+| 2 | **Explicit multi-level (hierarchical) reduce-scatter → inter-node → all-gather decomposition** | BlueConnect (MLSys'19); **HiCCL (IPDPS'25, 1.55× RCCL); "Big Send-off"/PCCL (SC'25, on Frontier MI250X)** | Multi-node MI300/MI200; inter-node phase carries only 1/L of the data | Medium-High |
 | 3 | **PCIe-switch-locality-aware hierarchical reduction** for PCIe-attached (non-XGMI) GPU platforms — *narrow residual of the MVAPICH / D.K. Panda direction* | Panda group GPU-aware MPI; Faraji & Afsahi 2018 | PCIe-only boxes (e.g. MI210/PCIe); niche on XGMI clusters | Low–Medium (see 2.3 — mostly already covered) |
-| 4 | **Staged / aggregated AllToAll** (Bruck for small, hierarchical aggregation for large) | Bruck 1997; Panda group hierarchical A2A (NSF'21) | MoE / expert-parallel small + medium inter-node AllToAll | Medium |
-| 5 | **Programmable execution-plan interpreter** (MSCCL/MSCCL++-style), now *removed* from RCCL | MSCCL/TACCL (ASPLOS'21, NSDI'22); MSCCL++ | Lets synthesized, topology-optimal schedules ship without a code change | Medium |
+| 4 | **Staged / aggregated AllToAll** (incast-aware; Bruck for small) | Bruck 1997; Panda hierarchical A2A (NSF'21); **FLASH (2025, measured on MI300X, 1.18–4.48× vs RCCL FanOut)** | MoE / expert-parallel inter-node AllToAll | Medium-High |
+| 5 | **Programmable execution-plan interpreter** (MSCCL++-style) — RCCL *had* it and **just removed it** (`CHANGELOG.md:45`) | MSCCL++ (ASPLOS'25, 3.8× on MI300X); TE-CCL (SIGCOMM'24, 3.18× RCCL) | Lets synthesized, topology-optimal schedules ship as data | Medium-High |
 | 6 | **Swing** bandwidth-optimal AllReduce for rail/torus inter-node fabrics | De Sensi et al., NSDI'24 | Large-scale torus / dragonfly / rail-optimized Ethernet | Medium (topology-gated) |
+| 7 | **Fault-tolerant / elastic collectives** (route around NIC/rank failure) | NCCLX FTAR (2025); R2CCL (2025); Mycroft (SOSP'25) | 10k–100k-GPU clusters — job *survivability*, not just speed | High strategic (at scale) |
 
 > **Correction after code cross-check (see the verification note at the end):** an earlier draft of this document claimed item #3 was backed by a "cost-model defect" in which RCCL ignores the reverse direction of PCIe links. **That claim was wrong and has been removed.** On re-reading the code, RCCL already models each link direction as an *independent, full-bandwidth* resource (full-duplex), and already drives both directions via multi-channel mirrored rings and the double-binary tree. The core premise of the Panda "use the idle reverse PCIe direction" work is therefore *already largely satisfied* in RCCL; only a narrow residual remains (Part 2.3). The strongest genuinely-missing items are **#2 (hierarchical decomposition)** and, as a fresh algorithm, **#1 (Rabenseifner)** — with the caveats noted in their sections.
 
@@ -126,6 +127,8 @@ Each level uses the algorithm/protocol best suited to *its* fabric, and — crit
 
 **Verdict:** Medium-High confidence. Most promising multi-node structural change; reuses 2.1 as its top-level kernel. Requires A/B measurement against tuned Ring/Tree before adoption.
 
+> **2024–2026 literature validation (added after a follow-up research pass).** This decomposition is exactly what two peer-reviewed hierarchical libraries do, both with **direct AMD evidence**: **"The Big Send-off" / PCCL** (SC'25, arXiv:2504.18658), evaluated on **2,048 GCDs of Frontier (AMD MI250X)**, reports ~**10× all-reduce and 40–60% end-to-end GPT-3-scale training speedup vs RCCL** (its "168× reduce-scatter" is a small-message corner case, not the headline); and **HiCCL** (IPDPS'25, arXiv:2408.05962), portable across NVIDIA/AMD/Intel, reports **1.55× over RCCL** by composing multicast/reduction/fence primitives with striping+pipelining. These substantiate the upside — while confirming the honest caveat that gains over a *tuned* RCCL are regime-specific.
+
 ### 2.3 The MVAPICH / D.K. Panda "bidirectional PCIe tree" direction you raised — *mostly already covered*
 
 This is the item that motivated your question. After cross-checking the code, the honest finding is that **RCCL already implements the core of what this line of work advocates**, so the earlier draft's "cost-model defect" framing was incorrect and has been removed. The detail matters, so here is the evidence.
@@ -161,15 +164,19 @@ if (revBw) SUB_ROUND(revLink->bw, revBw);            // :117  reverse charged ON
 
 **Where RCCL falls short.** RCCL already has the *all-to-all-connected XGMI* case covered by Pivot A2A (`alltoall_pivot.h`) and a RocSHMEM GDA path, but the **cross-node** AllToAll falls back to direct/ring. MoE / expert-parallel training (the dominant AllToAll consumer today) is exactly small-to-medium messages across many nodes — the regime Bruck and hierarchical aggregation target. Note the honest caveat from the literature (ICHPC-Asia'24, *Bruck Performance Analysis*): plain Bruck's intra-node multi-GPU benefit is muted; the **inter-node** and **aggregation** variants are where the win is.
 
-**Verdict:** Medium. Real gap for inter-node MoE AllToAll; layer onto the existing Pivot/GDA paths rather than replacing them. Temper expectations with the ICHPC-Asia'24 caveat above — measure before enabling by default.
+**Verdict:** Medium→**Medium-High**. Real gap for inter-node MoE AllToAll; layer onto the existing Pivot/GDA paths rather than replacing them.
+
+> **2024–2026 literature validation (added after a follow-up research pass).** **FLASH** (arXiv:2505.09764) is the decisive data point: implemented on **ROCm/RCCL/MSCCL and measured on 4 nodes × 8 AMD MI300X**, it beats **RCCL's FanOut all-to-all by 1.18×–4.48×** on Megatron-LM MoE by making the schedule **incast-aware** (exploiting fast intra-server fabric to shuffle/load-balance before crossing slow inter-server links, via a Birkhoff decomposition computed in ~32 µs vs TACCL's ~1 hr). This is direct, on-AMD evidence that the staged/aggregated approach recommended here works and beats the current RCCL path — so it moves from "worth trying" toward "demonstrated." The ICHPC-Asia'24 caveat (plain intra-node Bruck is muted) still stands for the *small-message single-level* variant.
 
 ### 2.5 Restore a programmable execution-plan interpreter (MSCCL/MSCCL++-style)
 
 **What it is.** MSCCL (ASPLOS'21 / TACCL NSDI'22) and MSCCL++ execute a *data-driven schedule* — a per-(topology, size) program of send/recv/reduce steps synthesized offline (often optimally, via constraint solvers) — on a generic GPU interpreter kernel. This lets a vendor ship a *new* topology-tailored algorithm as a data file, with no library rebuild.
 
-**Where RCCL falls short.** This was explicitly **removed** (`rccl-usage-tips.rst:19`). The remaining extension point, the tuner plugin (`tuner_v6.h`), can only *choose among* Ring/Tree/CollNet/PAT and tweak channels/chunk size — it cannot express a new pattern. So every improvement in 2.1–2.4 currently requires a C++/HIP code change. Re-introducing an interpreter (or an MSCCL++-style executor) would let synthesized schedules — including Rabenseifner and hierarchical plans — be delivered and A/B-tested as data.
+**Where RCCL falls short — and a strong, specific twist.** RCCL had exactly this capability and **just removed it.** The top CHANGELOG entry (2.30.4, *Unreleased*, `CHANGELOG.md:45`) reads *"Removed MSCCL and MSCCL++ custom collective integration; legacy `mscclLoadAlgo`… APIs remain as no-ops."* On this branch there are **zero** `mscclpp` source files and no `RCCL_MSCCLPP_THRESHOLD` symbol (verified). But earlier RCCL releases (≈2.26–2.28, `CHANGELOG.md:87,147,192`) shipped MSCCL++ dispatch for AllReduce/AllGather on gfx942, gated by `RCCL_MSCCLPP_THRESHOLD`. So this is not a "build something new" recommendation — it is **restore the recently-removed, already-AMD-proven MSCCL++ path**. The remaining extension point today, the tuner plugin (`tuner_v6.h`), can only *choose among* Ring/Tree/CollNet/PAT and tweak channels/chunk size — it cannot express a new pattern, so every improvement in 2.1–2.4 currently requires a C++/HIP code change.
 
-**Verdict:** Medium. A force-multiplier rather than a point fix; reduces the cost of shipping 2.1–2.4 and future research.
+**External evidence this is worth it (2024–2026 literature).** MSCCL++ (ASPLOS'25, arXiv:2504.09014) reports up to **3.8× small-message / 2.2× large-message AllReduce on MI300X** and was in production (Azure). Independent schedule synthesizers now emit onto such executors: **TE-CCL** (SIGCOMM'24) reports **3.18× vs RCCL / 2.14× vs TACCL** by casting scheduling as a multi-commodity-flow MILP. Together they make the "ship a synthesized, topology-optimal schedule as data" story concrete for AMD.
+
+**Verdict:** Medium→**Medium-High** given it is a *restoration* of a proven path, not a green-field build. A force-multiplier that also lets 2.1–2.4 and TE-CCL/TACCL-synthesized plans be delivered and A/B-tested as data rather than code.
 
 ### 2.6 Swing — bandwidth-optimal AllReduce for rail/torus inter-node fabrics
 
@@ -178,6 +185,14 @@ if (revBw) SUB_ROUND(revLink->bw, revBw);            // :117  reverse charged ON
 **Important applicability gate (don't over-sell it).** The paper is explicit: on a **full-bandwidth, non-blocking fat tree, Swing equals recursive doubling** — its advantage exists only where bisection is *limited* and hop-distance creates link contention (torus, dragonfly, rail-optimized Ethernet). So Swing is *not* a win inside a fully-connected XGMI node; it is a forward-looking option for **large-scale AMD clusters on Ultra-Ethernet / rail or torus inter-node fabrics**.
 
 **Verdict:** Medium, topology-gated. Highest value only at scale on contention-limited networks; implement as a selectable inter-node AllReduce, guarded by a topology predicate.
+
+### 2.7 Fault-tolerant collectives — a gap this survey originally missed (surfaced by follow-up research)
+
+**What it is.** At 10k–100k-GPU scale, a single NIC-port-down or a straggler stalls the *entire* communicator and can crash the job via timeout, because Ring/Tree have no way to route around a failed participant. The 2024–2026 literature makes fault tolerance table-stakes: Meta's **NCCLX** ships a **Fault-Tolerant AllReduce (FTAR)** (arXiv:2510.20171; 9–18% lower latency than NCCL with half the thread blocks, plus elastic reconfiguration); **R2CCL** (arXiv:2512.25059) migrates transmission around NIC-port failures NCCL can't survive (12× lower overhead vs AdapCC); **OptCC** ("Don't Let a Few Network Failures Slow the Entire AllReduce") reaches near-optimal with only **2–6% overhead** vs a fault-free ring; and **Mycroft** (SOSP'25) localizes the failing rank/link instead of restarting the job.
+
+**Where RCCL falls short.** RCCL, being NCCL-derived, inherits the **no-native-fault-tolerance** limitation — there is no FTAR/elastic-communicator equivalent in this tree. For AMD operators targeting large clusters, this is arguably a higher-priority gap than any raw-bandwidth algorithm, because it changes job *survivability*, not just speed.
+
+**Verdict:** High strategic priority at scale (library-agnostic techniques exist to copy); lower priority for single-node / small-cluster users. Distinct from the raw-performance items above — it's about resilience.
 
 ---
 
@@ -291,4 +306,8 @@ Every load-bearing claim in this document was re-read against the source. This w
 - **Hierarchical AllGather:** requires **`nNodes ≥ 8`**, not merely multi-node.
 - **PAT:** it is **upstream NCCL, not AMD-specific**, and "Bruck-derived" is an external attribution not present in the code — both softened.
 
-*Prepared by survey of the `develop` branch tree; corrected after a line-by-line author cross-check and a second-pass four-reviewer adversarial audit (independent Opus agents). Line numbers may drift as the branch advances.*
+**Round 3 — follow-up literature pass (2024–2026 state of the art), reconciled against this branch:**
+- Added on-AMD validation to §2.2 (Big Send-off/PCCL SC'25 on Frontier MI250X; HiCCL IPDPS'25), §2.4 (FLASH, measured on MI300X, 1.18–4.48× vs RCCL FanOut), and §2.5 (MSCCL++ ASPLOS'25 3.8× on MI300X; TE-CCL SIGCOMM'24 3.18× vs RCCL). Added §2.7 (fault-tolerant collectives) as a gap the first draft missed.
+- **Version-skew caught and corrected:** public write-ups describe MSCCL++ (and NPKit) as *present in RCCL*. That is true of released RCCL (~2.26–2.28) but **not of this branch** — the 2.30.4 CHANGELOG has a `Removed` section for both MSCCL/MSCCL++ (`CHANGELOG.md:45`) and NPKit, and `src/` contains **zero** `mscclpp` files (verified). §2.5 is therefore framed as *restore the recently-removed, already-AMD-proven* MSCCL++ path — not "it's already there."
+
+*Prepared by survey of the `develop` branch tree; corrected after a line-by-line author cross-check, a second-pass four-reviewer adversarial audit (independent Opus agents), and a third-pass literature reconciliation. Line numbers may drift as the branch advances.*
