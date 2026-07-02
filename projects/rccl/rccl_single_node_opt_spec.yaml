@@ -1,0 +1,222 @@
+name: rccl-single-node-opt
+version: "0.1.0"
+description: |
+  Implement the top single-node / intra-node performance gaps in RCCL (targets 1-4
+  from projects/rccl/RCCL_SINGLE_NODE_PERF_GAPS_IMPLEMENTATION.md), each behind an
+  env gate that defaults OFF, and MEASURE the impact with rccl-tests BEFORE and
+  AFTER every change.
+
+  Target hardware: one AMD node = 8x MI300X (gfx942/CDNA3) or 8x MI355X (gfx950/CDNA4)
+  in a fully-connected XGMI clique (also XCD/IOD chiplet + CPX partition modes).
+  Scope is intra-node performance ONLY (latency/bandwidth of AllReduce / AllGather /
+  ReduceScatter / AllToAll). Exclude inter-node/network, resilience, and anything
+  needing NVIDIA multimem/TMA/NVSwitch.
+
+  "Targets 1-4" (post-audit split of Rank 1 into 1a/1b): T1a quantized two-shot
+  AllReduce, T1b quantized MoE AllToAll, T2 CPX/XCD chiplet-aware tuner, T3 generalize
+  DDA/symmetric AR + LL128, T4 log-round recursive-halving RS/AR. Audit-recommended
+  risk-adjusted order: T2 -> T3 -> T1a -> T1b -> T4 (lossless first; lossy quantized
+  paths off by default and never on the exact-reduction path; T4 is low priority).
+
+  Toolchain: ROCm/HIP (hipcc), build RCCL via `projects/rccl/install.sh` (produces
+  librccl.so) and rccl-tests via `projects/rccl-tests/install.sh` (perf binaries:
+  all_reduce_perf, all_gather_perf, reduce_scatter_perf, alltoall_perf, broadcast_perf,
+  reduce_perf). Env-gate registration pattern: RCCL_PARAM(Name,"ENV_NAME",default)
+  (see src/collectives.cc:127-128). Cost model: src/graph/tuning.cc:1148.
+
+  MANDATORY measurement discipline (applies to every target feature): capture the
+  rccl-tests baseline BEFORE touching code (F001); after the change run the sweep
+  twice - gate OFF (must match baseline within +/-2% busbw with #wrong==0, proving
+  inertness) and gate ON (the impact measurement); record a before/after table under
+  projects/rccl/perf_results/. Correctness: lossless targets require #wrong==0 (bit
+  exact); lossy targets (T1a/T1b) require bounded mean relative error vs an fp32
+  reference (<=2e-2 for Q4/FP4, <=5e-3 for Q8/FP8). Every target must build and be
+  recorded on BOTH gfx942 and gfx950.
+
+workspace: /home/user/rocm-systems
+
+features:
+
+  F001:
+    title: "Baseline build + rccl-tests BEFORE capture"
+    description: |
+      Establish the pre-change baseline. Build RCCL and rccl-tests unmodified, confirm
+      the 8-GPU XGMI clique via tools/topo_expl, and capture the rccl-tests performance
+      sweep that later targets are measured against. Record ROCm version and GPU arch
+      (gfx942 vs gfx950). Save raw outputs (with correctness checking on, -c 1) to
+      projects/rccl/perf_results/baseline/ for AllReduce (fp16 + bf16), ReduceScatter,
+      AllGather, and AllToAll across the full size range so each target has a matching
+      baseline. This is the "BEFORE" half of the before/after impact measurement.
+    priority: critical
+    depends_on: []
+    acceptance_criteria:
+      - "Command succeeds: cd projects/rccl && ./install.sh (librccl.so built)"
+      - "Command succeeds: cd projects/rccl-tests && ./install.sh (perf binaries built)"
+      - "Command succeeds: tools/topo_expl confirms an 8-GPU fully-connected XGMI clique"
+      - "Command succeeds: build/all_reduce_perf -b 8 -e 8G -f 2 -g 8 -d half -c 1 (exit 0, #wrong==0)"
+      - "File exists: projects/rccl/perf_results/baseline/allreduce_half.txt"
+      - "File exists: projects/rccl/perf_results/baseline/allreduce_bfloat16.txt"
+      - "File exists: projects/rccl/perf_results/baseline/reducescatter_half.txt"
+      - "File exists: projects/rccl/perf_results/baseline/alltoall_half.txt"
+      - "File exists: projects/rccl/perf_results/baseline/ENV.txt (records ROCm version and gfx942/gfx950 arch)"
+
+  F002:
+    title: "A/B benchmark harness (before/after delta)"
+    description: |
+      Provide a reusable script projects/rccl/perf_results/ab_bench.sh that runs a named
+      rccl-tests sweep (collective, size range, dtype, ngpus, env vars) and a parser that
+      extracts per-size busbw / algbw / latency / #wrong from rccl-tests stdout, then emits
+      a markdown before/after table given a baseline file and an after file (computing
+      per-size busbw uplift %, the crossover size where gate-ON first beats baseline, the
+      max gate-OFF regression, and a PASS/FAIL verdict). For lossy targets the harness also
+      accepts a measured mean-relative-error column in place of the #wrong gate. This
+      harness is what every target feature uses to produce its "AFTER" evidence.
+    priority: high
+    depends_on: ['F001']
+    acceptance_criteria:
+      - "File exists: projects/rccl/perf_results/ab_bench.sh"
+      - "Command succeeds: bash projects/rccl/perf_results/ab_bench.sh --help"
+      - "Running the harness on a baseline file twice yields <=2% reported delta (self-consistency)"
+      - "Harness output includes columns: size, baseline busbw, after busbw, uplift %, #wrong (or rel-err), and a PASS/FAIL verdict line"
+
+  F003:
+    title: "T2 - CPX/XCD/IOD chiplet-hierarchy-aware algo+protocol selection (lossless)"
+    description: |
+      Recommended lead (lossless, tuner scaffold already exists). Detect SPX vs CPX
+      partition mode and XCD/IOD grouping and pick algo+protocol per message-size zone
+      (small -> Tree+LL, mid -> Tree+LL128, large -> Ring+Simple), exploiting the MI300X
+      intra-GPU bandwidth hierarchy (within-XCD >> XCD->IOD >> IOD->HBM). Add a partition/
+      XCD detector in src/graph/topo.* consuming s_partition_id already parsed at
+      src/misc/alt_rsmi.cc:133,151; extend the CSV tuner schema at
+      src/plugin/tuner/csv_tuner.cc:44 with optional trailing fields (partitionMode,
+      localGroup) in a backward-compatible way and add them to the match loop (:587-602);
+      ship tuner/rccl_tuner_gfx942.csv and add CPX (nRanks=64) rows to
+      tuner/rccl_tuner_gfx950.csv. Optionally add an IOD-distance hop penalty to the cost
+      model at src/graph/tuning.cc:1148. Gate: RCCL_CHIPLET_TUNER_ENABLE (default 0).
+    priority: high
+    depends_on: ['F002']
+    acceptance_criteria:
+      - "RCCL_PARAM RCCL_CHIPLET_TUNER_ENABLE registered with default 0"
+      - "Command succeeds: cd projects/rccl && ./install.sh on gfx942 AND gfx950"
+      - "File exists: tuner/rccl_tuner_gfx942.csv (with chiplet-aware rows)"
+      - "Regression: with RCCL_CHIPLET_TUNER_ENABLE=0, all_reduce_perf -b 4K -e 4M -g 8 busbw within +/-2% of baseline and #wrong==0"
+      - "Impact: with RCCL_CHIPLET_TUNER_ENABLE=1 in CPX mode (mpirun -np 64 --bind-to numa, all_reduce_perf -b 4K -e 4M), small-message (4-16 KiB) latency reduced >=2x vs baseline"
+      - "Correctness: #wrong==0 across the sweep (lossless)"
+      - "File exists: projects/rccl/perf_results/T2_cpx_tuner.md (before/after table, both arches, generated via ab_bench.sh)"
+
+  F004:
+    title: "T3 - Generalize DDA/symmetric AR beyond 8-rank/ncclSum + add symmetric LL128 (lossless)"
+    description: |
+      Widen an existing portable path. Add LL128 to the symmetric protocol axis
+      (rcclSymkProto is currently _LL/_Simple only at src/sym_kernels.cc:152) via
+      src/device/symmetric/generate.py + kernel.cuh with matching tuning entries; and
+      relax the DDA/symmetric AllReduce eligibility beyond exactly 8 ranks
+      (kDdaNranks at src/dda_all_reduce_ipc.cu:136) to 2/4/8, plus relax the ncclSum-only
+      gate for associative ops on the LD/ST one-shot path (generalize
+      CollCommon.h vecElementAdd). Keep MC/TMA paths excluded (NVIDIA-only,
+      src/device/symmetric/generate.py:106). Verify 128B atomic writes on XGMI for
+      gfx942/gfx950 before enabling LL128. Gates: RCCL_SYM_LL128_ENABLE,
+      RCCL_DDA_NRANKS_RELAX (default 0).
+    priority: high
+    depends_on: ['F002']
+    acceptance_criteria:
+      - "RCCL_PARAM RCCL_SYM_LL128_ENABLE and RCCL_DDA_NRANKS_RELAX registered, default 0"
+      - "Command succeeds: cd projects/rccl && ./install.sh on gfx942 AND gfx950"
+      - "Regression: with both gates 0, the 8-rank ncclSum all_reduce_perf path is bit-identical to baseline (#wrong==0, busbw within +/-2%)"
+      - "Impact: with RCCL_SYM_LL128_ENABLE=1, all_reduce_perf -b 1M -e 256M -g 4 selects LL128 and reaches >= ~95% of peak busbw in the large band"
+      - "Impact: with RCCL_DDA_NRANKS_RELAX=1, all_reduce_perf -g 2 and -g 4 run the generalized DDA path (#wrong==0)"
+      - "File exists: projects/rccl/perf_results/T3_sym_ll128.md (before/after table, both arches)"
+
+  F005:
+    title: "T1a - Inline block-quantized two-shot AllReduce (QuickReduce, lossy)"
+    description: |
+      Highest peak speedup but LOSSY - off by default and never selected on the exact
+      ncclSum path. Two-shot RS -> reduce -> AG where every XGMI transfer carries block-32
+      quantized data with a per-block FP16 scale. Codecs Q4/Q6/Q8/FP8 on gfx942; native
+      FP4 on gfx950 via __builtin_amdgcn_cvt_scalef32_pk_fp4_f16 (gfx950-only; #if-guard,
+      gfx942 falls back to INT codecs). New codec header
+      src/include/algorithms/all_reduce/quick_reduce_codec.h; new kernel
+      src/dda_quick_reduce_ipc.cu + .../all_reduce/quick_reduce_dda.h modeled on
+      ddaAllReduceTreeIpc (src/include/algorithms/all_reduce/all_reduce_dda.h:56), reusing
+      src/include/ipc_gpu_barrier.h and CollCommon.h; co-locate the FP4 builtin with the
+      FP8 builtins in src/include/rccl_float8.h; dispatch in src/collectives.cc near the
+      DDA call (:440-442), relaxing the exactly-8-rank gate to 2/4/8; scale effective
+      nBytes by the compression ratio in the cost model (src/graph/tuning.cc:1148) so the
+      selector prefers it above the crossover. Gates: RCCL_QUICKREDUCE_ENABLE (default 0),
+      RCCL_QUICKREDUCE_CODEC (q4/q6/q8/fp8/fp4), RCCL_QUICKREDUCE_MIN_BYTES (~1 MiB).
+    priority: high
+    depends_on: ['F002']
+    acceptance_criteria:
+      - "RCCL_PARAM RCCL_QUICKREDUCE_ENABLE default 0; lossy path NEVER auto-selected on the exact ncclSum default path"
+      - "File exists: src/include/algorithms/all_reduce/quick_reduce_codec.h"
+      - "File exists: src/dda_quick_reduce_ipc.cu"
+      - "Command succeeds: cd projects/rccl && ./install.sh on gfx942 (INT/FP8 codecs) AND gfx950 (adds FP4)"
+      - "Regression: with RCCL_QUICKREDUCE_ENABLE=0, all_reduce_perf -b 8 -e 8G -g 8 within +/-2% of baseline and #wrong==0"
+      - "Impact: with RCCL_QUICKREDUCE_ENABLE=1 RCCL_QUICKREDUCE_CODEC=fp4 on gfx950, all_reduce_perf busbw >= 1.5x baseline above the ~1 MiB crossover (record the crossover size)"
+      - "Correctness: mean relative error vs an fp32 reference reduction <= 2e-2 for Q4/FP4 (recorded, not silently relaxed)"
+      - "File exists: projects/rccl/perf_results/T1a_quickreduce.md (before/after table + rel-err, both arches)"
+
+  F006:
+    title: "T1b - Quantized MoE AllToAll dispatch/combine (lossy, separate kernel)"
+    description: |
+      Distinct from T1a: AllToAll is a permute/shuffle with NO reduction, so it does NOT
+      reuse the RS->reduce->AG or ncclSum machinery. Per-token (not per-block) scales and
+      asymmetric precision (MoRI-style MXFP4 dispatch / FP8 combine). New kernel under
+      src/device/ + src/include/algorithms/alltoall/, dispatched in src/collectives.cc
+      alongside the existing Pivot AllToAll path; share the symmetric codec from T1a where
+      applicable, extended for per-token scales. Gate: RCCL_QUANT_ALLTOALL_ENABLE
+      (default 0). Intra-node MoE token-sized messages only; the inter-node RDMA path is
+      out of scope.
+    priority: medium
+    depends_on: ['F005']
+    acceptance_criteria:
+      - "RCCL_PARAM RCCL_QUANT_ALLTOALL_ENABLE default 0"
+      - "File exists: src/include/algorithms/alltoall/ (new quantized AllToAll header)"
+      - "Command succeeds: cd projects/rccl && ./install.sh on gfx942 AND gfx950"
+      - "Implementation does NOT depend on ncclSum associativity (AllToAll performs no reduction)"
+      - "Regression: with RCCL_QUANT_ALLTOALL_ENABLE=0, alltoall_perf -b 8K -e 1G -g 8 within +/-2% of baseline"
+      - "Impact: with RCCL_QUANT_ALLTOALL_ENABLE=1, alltoall_perf busbw uplift in the MoE token-size band vs baseline"
+      - "Correctness: mean relative error vs fp32 reference within bound for the chosen codec"
+      - "File exists: projects/rccl/perf_results/T1b_quant_alltoall.md (before/after table, both arches)"
+
+  F007:
+    title: "T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)"
+    description: |
+      Low priority - the audit rates single-node value modest (at p=8 the double-binary
+      tree is already competitive); implement and MEASURE honestly, a flat/small result is
+      an acceptable recordable outcome, do not force-enable. ceil(log2 p)-round reduce-
+      scatter (p=8 -> 3 rounds vs ring's 7) at p-1 volume; AllReduce = RS + reversed AG.
+      Add an RCCL-local algorithm id (extend the RCCL_DIRECT_ALLGATHER = NCCL_NUM_ALGORITHMS
+      pattern at src/include/rccl_common.h:63) to avoid perturbing the NCCL enum; new kernel
+      src/dda_recursive_halving_ipc.cu + .../reduce_scatter/rhd_dda.h reusing IpcGpuBarrier
+      and CollCommon.h; dispatch in src/collectives.cc (RS :576, AR :440); add a log-p
+      latCount term at src/graph/tuning.cc:1147 so the selector prefers it in the sync-bound
+      medium band. Gate: RCCL_RHD_ENABLE (default 0). Lossless (bit-exact).
+    priority: low
+    depends_on: ['F002']
+    acceptance_criteria:
+      - "RCCL_PARAM RCCL_RHD_ENABLE default 0"
+      - "File exists: src/dda_recursive_halving_ipc.cu"
+      - "Command succeeds: cd projects/rccl && ./install.sh on gfx942 AND gfx950"
+      - "Regression: with RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0"
+      - "Correctness: with RCCL_RHD_ENABLE=1, #wrong==0 (bit-exact) across the sweep"
+      - "Impact (honest): before/after table records latency vs ring in the medium band; a null/small result is documented, not hidden"
+      - "File exists: projects/rccl/perf_results/T4_rhd.md (before/after table, both arches)"
+
+  F008:
+    title: "Consolidated before/after impact report"
+    description: |
+      Aggregate the per-target before/after tables into one summary comparing the F001
+      baseline against each target's gate-ON result across the shared AllReduce sweep (and
+      each target's own collective), for both gfx942 and gfx950. Include per-target verdict
+      (PASS/FAIL vs its threshold), the crossover/regime where each helps, correctness
+      (bit-exact vs measured rel-err), and a one-line recommendation on default posture
+      (all remain off by default; note which are worth promoting behind auto-selection for
+      their regime). This is the deliverable that shows the measured impact of the changes.
+    priority: medium
+    depends_on: ['F003', 'F004', 'F005', 'F006', 'F007']
+    acceptance_criteria:
+      - "File exists: projects/rccl/perf_results/IMPACT_SUMMARY.md"
+      - "Summary references the F001 baseline and each of the T1a/T1b/T2/T3/T4 before/after tables"
+      - "Summary reports results for BOTH gfx942 and gfx950"
+      - "Each target has an explicit PASS/FAIL verdict against its acceptance threshold and a default-posture recommendation"
