@@ -1,0 +1,26 @@
+timestamp: 2026-07-08 03:22:34 UTC
+feature_id: 649884fb-fbc4-43b0-b27e-d0b5ecff3b26
+feature_name: A/B benchmark harness (before/after delta)
+outcome: completed
+duration_ms: 208709
+num_turns: 14
+cost_usd: 4.0141935
+---
+timestamp: 2026-07-08 04:17:28 UTC
+feature_id: 0e44d83e-4da2-42b2-a35b-871fbfea199c
+feature_name: T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)
+outcome: failed
+duration_ms: 742262
+num_turns: 74
+cost_usd: 16.88447775
+blockers: Verification failed: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/7 criteria: File exists: src/dda_recursive_halving_ipc.cu; command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) -> command timed out after 600s: 'cd projects/rccl && ./install.sh'
+
+Failed checks: acceptance_criteria_met
+---

@@ -11,6 +11,7 @@
 #include "comm.h"
 #include "topo.h"
 #include "nccl_tuner.h"
+#include "dda_recursive_halving_ipc.h"
 
 NCCL_PARAM(Nthreads, "NTHREADS", -2);
 NCCL_PARAM(Ll128Nthreads, "LL128_NTHREADS", -2);
@@ -1145,6 +1146,21 @@ ncclResult_t ncclTopoGetAlgoTime(struct ncclComm* comm, int coll, int algorithm,
 #endif
   // Tree pipelining saves latency in aggregation cases
   int latCount = algorithm == NCCL_ALGO_RING ? numPipeOps : DIVUP(numPipeOps, NCCL_MAX_DEV_WORK_BATCH_COLLS);
+  // Log-round recursive-halving (RCCL_RHD_ENABLE): the ring cost model charges a
+  // per-rank latency count (numPipeOps scaled by nRanks-1 hops), but RHD reaches
+  // the reduced result in ceil(log2 nRanks) sync rounds. Reflect that lower
+  // latency for the ring model in the sync-bound medium band so the selector
+  // prefers the RHD path there. Strictly gated: no-op unless RHD is enabled and
+  // the comm is a single-node power-of-two clique that RHD can actually serve.
+  if (algorithm == NCCL_ALGO_RING &&
+      (coll == ncclFuncAllReduce || coll == ncclFuncReduceScatter) &&
+      comm->nNodes == 1 && comm->nRanks > 1 &&
+      (comm->nRanks & (comm->nRanks - 1)) == 0 && ncclRhdEnabled()) {
+    const int logP = log2i(comm->nRanks);
+    if (logP > 0) {
+      latCount = DIVUP(latCount * logP, comm->nRanks);
+    }
+  }
   *time = lat * latCount + nBytes / (1000 * bw);
   return ncclSuccess;
 }

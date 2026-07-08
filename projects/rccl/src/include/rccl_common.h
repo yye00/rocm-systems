@@ -66,6 +66,7 @@ typedef enum {
   RCCL_WARP_SPEED,
 #endif
   RCCL_SYMMETRIC,
+  RCCL_RECURSIVE_HALVING, // Log-round recursive-halving/doubling DDA (RCCL_RHD_ENABLE)
   RCCL_ALGO_COUNT
 } rcclAddonAlgos_t;
 

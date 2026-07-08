@@ -1,0 +1,32 @@
+# rccl-tests version 2.18.3-develop:12b92a8ca6 rccl-headers=22606 rccl-library=23004
+# Collective test starting: reduce_scatter_perf
+# nThread 1 nGpus 8 minBytes 262144 maxBytes 67108864 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  0 [0000:75:00] AMD Instinct MI355X
+#  Rank  1 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  1 [0000:05:00] AMD Instinct MI355X
+#  Rank  2 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  2 [0000:65:00] AMD Instinct MI355X
+#  Rank  3 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  3 [0000:15:00] AMD Instinct MI355X
+#  Rank  4 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  4 [0000:f5:00] AMD Instinct MI355X
+#  Rank  5 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  5 [0000:85:00] AMD Instinct MI355X
+#  Rank  6 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  6 [0000:e5:00] AMD Instinct MI355X
+#  Rank  7 Group  0 Pid 1229870 on smci355-ccs-aus-m03-05 device  7 [0000:95:00] AMD Instinct MI355X
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong  
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)          
+      262144          8192     float     sum      -1    69.49    3.77    3.30       0    61.49    4.26    3.73       0
+      524288         16384     float     sum      -1    63.60    8.24    7.21       0    57.19    9.17    8.02       0
+     1048576         32768     float     sum      -1    58.58   17.90   15.66       0    64.15   16.35   14.30       0
+     2097152         65536     float     sum      -1    63.53   33.01   28.89       0    63.00   33.29   29.13       0
+     4194304        131072     float     sum      -1    52.46   79.95   69.95       0    51.68   81.17   71.02       0
+     8388608        262144     float     sum      -1    55.63  150.80  131.95       0    53.43  157.00  137.37       0
+    16777216        524288     float     sum      -1    80.79  207.66  181.71       0    77.50  216.48  189.42       0
+    33554432       1048576     float     sum      -1   130.56  257.01  224.88       0   124.26  270.04  236.28       0
+    67108864       2097152     float     sum      -1   226.91  295.75  258.78       0   222.55  301.54  263.85       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 104.192 
+#
+# Collective test concluded: reduce_scatter_perf
+#
+

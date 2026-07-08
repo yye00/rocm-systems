@@ -15599,3 +15599,369 @@ Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues abov
 [2026-07-07 22:21:33] [INFO] [skills_installer] Installed 9 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills
 [2026-07-07 22:21:33] [INFO] [skills_installer] Removed evaluator-only skill adversarial-self-review from implementation workspace /home/yelkhamr/dark-factory/rocm-systems/.claude/skills/adversarial-self-review (Round 0 Task 1, Gap #1)
 [2026-07-07 22:21:33] [INFO] [skills_installer] Installed 8 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills
+[2026-07-07 22:22:34] [INFO] [git_ops] Created commit 5d9529ee for feature 649884fb-fbc4-43b0-b27e-d0b5ecff3b26
+[2026-07-07 22:22:34] [INFO] [run_loop] Feature 649884fb-fbc4-43b0-b27e-d0b5ecff3b26 completed successfully
+[2026-07-07 22:22:34] [INFO] [run_loop] Feature 649884fb (A/B benchmark harness (before/after delta)) done: status=completed duration=208.7s cost=$4.0142 attempts=0
+[2026-07-07 22:22:34] [INFO] [run_loop] Readiness seed sweep: seeded confidence for 4 ready feature(s)
+[2026-07-07 22:22:34] [INFO] [run_loop] Bootstrap bypass granted for feature 0e44d83e (readiness=0.56, bootstrap_attempts=0, research_iterations=0); executing once to seed research signal.
+[2026-07-07 22:22:34] [INFO] [run_loop] Executing feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)
+[2026-07-07 22:22:34] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: TDD mode enabled
+[2026-07-07 22:22:34] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: Sub-agent mode enabled
+[2026-07-07 22:22:34] [INFO] [skills_installer] Installed 8 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills
+[2026-07-07 22:35:52] [INFO] [cli] Starting build run
+[2026-07-07 22:35:52] [INFO] [cli] Ablation mode: V0
+Note: no ANTHROPIC_API_KEY set. Will use Claude Code Max Pro OAuth if available.
+[2026-07-07 22:35:53] [INFO] [mcp_lifecycle] bob-memory MCP server started (pid=1088418)
+[2026-07-07 22:35:53] [INFO] [cli] bob-memory MCP server started
+[2026-07-07 22:35:53] [INFO] [cli] Running all ready features
+Running all ready features...
+Spec file has changed since last run.
+[2026-07-07 22:35:53] [INFO] [cli] Spec change detected (old=78501fea9d7e9fab7ab60ad5334a61d667da22f7047f0632a13cfacf4175f68e, new=8ed43d50cca3b719f276786a6963a35ff8309fb8f0494e774824e2ae39bb3209)
+  +9 new feature(s)
+  -9 removed feature(s)
+[2026-07-07 22:35:53] [INFO] [run_loop] Starting orchestration loop for project 56766e14-4741-4ab0-9cd0-0c16e6d99434
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec stability check: feature 0e44d83e (T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)) score=0.167 route=clarification consensus=False
+[2026-07-07 22:35:53] [WARNING] [run_loop] Spec stability below threshold (0.167 < 0.7) for feature 0e44d83e (T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)); disagreeing slots: [('AC-1', 'behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs'), ('AC-1', 'behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs [variant-1]'), ('AC-3', 'command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only)'), ('AC-3', 'command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) [variant-2]'), ('AC-4', 'behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0')] — routing to F-R7-456 clarification
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for b6923101
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature b6923101 (F000, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for 8f1b1457
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature 8f1b1457 (F001, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for ad561b89
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature ad561b89 (F002, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for b32fbf02
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature b32fbf02 (F003, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for f46cd58d
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature f46cd58d (F004, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for c35299d6
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature c35299d6 (F005, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for 63967dfe
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature 63967dfe (F006, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for f2bcf42f
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature f2bcf42f (F007, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [WARNING] [run_loop] mid-run re-synthesis failed for dddc3924
+[2026-07-07 22:35:53] [INFO] [run_loop] Spec quality gate blocked feature dddc3924 (F008, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:53] [INFO] [run_loop] Mid-cascade crash recovery: promoted 1 orphaned pending feature(s) to 'ready': 0e44d83e
+[2026-07-07 22:35:53] [INFO] [run_loop] Promoted 9 pending root feature(s) (no declared deps) to 'ready': b6923101, 8f1b1457, ad561b89, b32fbf02, f46cd58d, c35299d6, 63967dfe, f2bcf42f, dddc3924
+[2026-07-07 22:35:53] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:53.814237+00:00"}
+[2026-07-07 22:35:54] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:35:54.593081+00:00"}
+[2026-07-07 22:35:54] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=1, #wrong==0 (bit-exact) across the sweep", "feature_id": null, "timestamp": "2026-07-08T03:35:54.593390+00:00"}
+[2026-07-07 22:35:54] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that before/after table records latency vs ring in the medium band; a null/small result is documented, not hidden when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:54.593597+00:00"}
+[2026-07-07 22:35:54] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_CHIPLET_TUNER_ENABLE registered when default 0", "feature_id": null, "timestamp": "2026-07-08T03:35:54.594023+00:00"}
+[2026-07-07 22:35:54] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_CHIPLET_TUNER_ENABLE=0, all_reduce_perf -b 4K -e 4M -g 8 busbw within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:35:54.967349+00:00"}
+[2026-07-07 22:35:55] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_CHIPLET_TUNER_ENABLE=1 in CPX mode (mpirun -np 64 --bind-to numa, all_reduce_perf -b 4K -e 4M), small-message (4-16 KiB) latency reduced >=2x vs baseline", "feature_id": null, "timestamp": "2026-07-08T03:35:55.719372+00:00"}
+[2026-07-07 22:35:55] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that #wrong==0 across the sweep (lossless) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:55.719765+00:00"}
+[2026-07-07 22:35:55] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_SYM_LL128_ENABLE and RCCL_DDA_NRANKS_RELAX registered, default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:55.720160+00:00"}
+[2026-07-07 22:35:56] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when both gates 0, the 8-rank ncclSum all_reduce_perf path is bit-identical to baseline (#wrong==0, busbw within +/-2%)", "feature_id": null, "timestamp": "2026-07-08T03:35:56.092209+00:00"}
+[2026-07-07 22:35:56] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_SYM_LL128_ENABLE=1, all_reduce_perf -b 1M -e 256M -g 4 selects LL128 and reaches >= ~95% of peak busbw in the large band", "feature_id": null, "timestamp": "2026-07-08T03:35:56.464100+00:00"}
+[2026-07-07 22:35:56] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_DDA_NRANKS_RELAX=1, all_reduce_perf -g 2 and -g 4 run the generalized DDA path (#wrong==0)", "feature_id": null, "timestamp": "2026-07-08T03:35:56.837707+00:00"}
+[2026-07-07 22:35:56] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_QUICKREDUCE_ENABLE default 0; lossy path NEVER auto-selected on the exact ncclSum default path when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:56.838285+00:00"}
+[2026-07-07 22:35:57] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUICKREDUCE_ENABLE=0, all_reduce_perf -b 8 -e 2G -g 8 within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:35:57.213932+00:00"}
+[2026-07-07 22:35:57] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUICKREDUCE_ENABLE=1 RCCL_QUICKREDUCE_CODEC=fp4 on gfx950, all_reduce_perf busbw >= 1.5x baseline above the ~1 MiB crossover (record the crossover size)", "feature_id": null, "timestamp": "2026-07-08T03:35:57.960555+00:00"}
+[2026-07-07 22:35:57] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that mean relative error vs an fp32 reference reduction <= 2e-2 for Q4/FP4 (recorded, not silently relaxed) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:57.960878+00:00"}
+[2026-07-07 22:35:57] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_QUANT_ALLTOALL_ENABLE default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:57.962362+00:00"}
+[2026-07-07 22:35:58] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Implementation does NOT depend on ncclSum associativity (AllToAll performs no reduction) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:58.331079+00:00"}
+[2026-07-07 22:35:58] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUANT_ALLTOALL_ENABLE=0, alltoall_perf -b 8K -e 1G -g 8 within +/-2% of baseline", "feature_id": null, "timestamp": "2026-07-08T03:35:58.699431+00:00"}
+[2026-07-07 22:35:59] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUANT_ALLTOALL_ENABLE=1, alltoall_perf busbw uplift in the MoE token-size band vs baseline", "feature_id": null, "timestamp": "2026-07-08T03:35:59.443239+00:00"}
+[2026-07-07 22:35:59] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that mean relative error vs fp32 reference within bound for the chosen codec when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:59.443621+00:00"}
+[2026-07-07 22:35:59] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Summary references the F001 baseline and each of the T1a/T1b/T2/T3/T4 before/after tables when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:59.444127+00:00"}
+[2026-07-07 22:35:59] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Summary reports gfx950 results (this host); gfx942 marked deferred (not fabricated) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:59.444314+00:00"}
+[2026-07-07 22:35:59] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Each target has an explicit PASS/FAIL verdict against its acceptance threshold and a default-posture recommendation when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:35:59.444495+00:00"}
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature b6923101 (F000, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature 8f1b1457 (F001, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature ad561b89 (F002, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature b32fbf02 (F003, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature f46cd58d (F004, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature c35299d6 (F005, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature 63967dfe (F006, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature f2bcf42f (F007, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Spec quality gate blocked feature dddc3924 (F008, score=0.0000) from reaching 'ready': Spec quality gate: BLOCKED
+  score=0.0000  threshold=0.85
+
+Component scores:
+  ambiguity:     0.0000  (weight 0.35)
+  reachability:  0.0000  (weight 0.25)
+  ears:          0.0000  (weight 0.15)
+  ac_coverage:   0.0000  (weight 0.25)
+
+Remediation required:
+  - No acceptance criteria provided — add structured ACs.
+
+Feature stays at 'pending' until spec_quality_score >= 0.85. Fix the issues above and re-run planning.
+[2026-07-07 22:35:59] [INFO] [run_loop] Executing feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)
+[2026-07-07 22:35:59] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: TDD mode enabled
+[2026-07-07 22:35:59] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: Sub-agent mode enabled
+[2026-07-07 22:35:59] [INFO] [skills_installer] Installed 8 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills
+[2026-07-07 22:54:58] [INFO] [cli] Starting build run
+[2026-07-07 22:54:58] [INFO] [cli] Ablation mode: V0
+Note: no ANTHROPIC_API_KEY set. Will use Claude Code Max Pro OAuth if available.
+[2026-07-07 22:55:00] [INFO] [mcp_lifecycle] bob-memory MCP server started (pid=1294942)
+[2026-07-07 22:55:00] [INFO] [cli] bob-memory MCP server started
+[2026-07-07 22:55:00] [INFO] [cli] Running all ready features
+Running all ready features...
+[2026-07-07 22:55:00] [INFO] [run_loop] Starting orchestration loop for project 56766e14-4741-4ab0-9cd0-0c16e6d99434
+[2026-07-07 22:55:00] [INFO] [run_loop] Spec stability check: feature 0e44d83e (T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)) score=0.167 route=clarification consensus=False
+[2026-07-07 22:55:00] [WARNING] [run_loop] Spec stability below threshold (0.167 < 0.7) for feature 0e44d83e (T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)); disagreeing slots: [('AC-1', 'behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs'), ('AC-1', 'behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs [variant-1]'), ('AC-3', 'command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only)'), ('AC-3', 'command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) [variant-2]'), ('AC-4', 'behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0')] — routing to F-R7-456 clarification
+[2026-07-07 22:55:00] [INFO] [run_loop] Mid-cascade crash recovery: promoted 1 orphaned pending feature(s) to 'ready': 0e44d83e
+[2026-07-07 22:55:00] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:00.039474+00:00"}
+[2026-07-07 22:55:00] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:55:00.805024+00:00"}
+[2026-07-07 22:55:00] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=1, #wrong==0 (bit-exact) across the sweep", "feature_id": null, "timestamp": "2026-07-08T03:55:00.805317+00:00"}
+[2026-07-07 22:55:00] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that before/after table records latency vs ring in the medium band; a null/small result is documented, not hidden when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:00.805525+00:00"}
+[2026-07-07 22:55:00] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_CHIPLET_TUNER_ENABLE registered when default 0", "feature_id": null, "timestamp": "2026-07-08T03:55:00.805932+00:00"}
+[2026-07-07 22:55:01] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_CHIPLET_TUNER_ENABLE=0, all_reduce_perf -b 4K -e 4M -g 8 busbw within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:55:01.179976+00:00"}
+[2026-07-07 22:55:01] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_CHIPLET_TUNER_ENABLE=1 in CPX mode (mpirun -np 64 --bind-to numa, all_reduce_perf -b 4K -e 4M), small-message (4-16 KiB) latency reduced >=2x vs baseline", "feature_id": null, "timestamp": "2026-07-08T03:55:01.927112+00:00"}
+[2026-07-07 22:55:01] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that #wrong==0 across the sweep (lossless) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:01.927393+00:00"}
+[2026-07-07 22:55:01] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_SYM_LL128_ENABLE and RCCL_DDA_NRANKS_RELAX registered, default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:01.927762+00:00"}
+[2026-07-07 22:55:02] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when both gates 0, the 8-rank ncclSum all_reduce_perf path is bit-identical to baseline (#wrong==0, busbw within +/-2%)", "feature_id": null, "timestamp": "2026-07-08T03:55:02.300148+00:00"}
+[2026-07-07 22:55:02] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_SYM_LL128_ENABLE=1, all_reduce_perf -b 1M -e 256M -g 4 selects LL128 and reaches >= ~95% of peak busbw in the large band", "feature_id": null, "timestamp": "2026-07-08T03:55:02.672471+00:00"}
+[2026-07-07 22:55:03] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_DDA_NRANKS_RELAX=1, all_reduce_perf -g 2 and -g 4 run the generalized DDA path (#wrong==0)", "feature_id": null, "timestamp": "2026-07-08T03:55:03.045393+00:00"}
+[2026-07-07 22:55:03] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_QUICKREDUCE_ENABLE default 0; lossy path NEVER auto-selected on the exact ncclSum default path when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:03.045816+00:00"}
+[2026-07-07 22:55:03] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUICKREDUCE_ENABLE=0, all_reduce_perf -b 8 -e 2G -g 8 within +/-2% of baseline and #wrong==0", "feature_id": null, "timestamp": "2026-07-08T03:55:03.420346+00:00"}
+[2026-07-07 22:55:04] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUICKREDUCE_ENABLE=1 RCCL_QUICKREDUCE_CODEC=fp4 on gfx950, all_reduce_perf busbw >= 1.5x baseline above the ~1 MiB crossover (record the crossover size)", "feature_id": null, "timestamp": "2026-07-08T03:55:04.165208+00:00"}
+[2026-07-07 22:55:04] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that mean relative error vs an fp32 reference reduction <= 2e-2 for Q4/FP4 (recorded, not silently relaxed) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:04.165474+00:00"}
+[2026-07-07 22:55:04] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_QUANT_ALLTOALL_ENABLE default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:04.166751+00:00"}
+[2026-07-07 22:55:04] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Implementation does NOT depend on ncclSum associativity (AllToAll performs no reduction) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:04.530530+00:00"}
+[2026-07-07 22:55:04] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUANT_ALLTOALL_ENABLE=0, alltoall_perf -b 8K -e 1G -g 8 within +/-2% of baseline", "feature_id": null, "timestamp": "2026-07-08T03:55:04.895583+00:00"}
+[2026-07-07 22:55:05] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_QUANT_ALLTOALL_ENABLE=1, alltoall_perf busbw uplift in the MoE token-size band vs baseline", "feature_id": null, "timestamp": "2026-07-08T03:55:05.631380+00:00"}
+[2026-07-07 22:55:05] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that mean relative error vs fp32 reference within bound for the chosen codec when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:05.631658+00:00"}
+[2026-07-07 22:55:05] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Summary references the F001 baseline and each of the T1a/T1b/T2/T3/T4 before/after tables when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:05.632156+00:00"}
+[2026-07-07 22:55:05] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Summary reports gfx950 results (this host); gfx942 marked deferred (not fabricated) when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:05.632345+00:00"}
+[2026-07-07 22:55:05] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that Each target has an explicit PASS/FAIL verdict against its acceptance threshold and a default-posture recommendation when the feature runs", "feature_id": null, "timestamp": "2026-07-08T03:55:05.632526+00:00"}
+[2026-07-07 22:55:05] [INFO] [run_loop] Executing feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)
+[2026-07-07 22:55:05] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: TDD mode enabled
+[2026-07-07 22:55:05] [INFO] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c: Sub-agent mode enabled
+[2026-07-07 22:55:05] [INFO] [skills_installer] Installed 8 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills
+[2026-07-07 23:07:28] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that RCCL_PARAM RCCL_RHD_ENABLE default 0 when the feature runs", "feature_id": null, "timestamp": "2026-07-08T04:07:28.696484+00:00"}
+[2026-07-07 23:17:28] [WARNING] [enhanced_verification] behavior-AC demoted to PASS via function-existence fallback (F-R7-582): criterion='behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=0, reduce_scatter_perf/all_reduce_perf -b 256K -e 64M -g 8 within +/-2% of baseline and #wrong==0' matched identifier='reduce_scatter_perf' in workspace
+[2026-07-07 23:17:28] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that when RCCL_RHD_ENABLE=1, #wrong==0 (bit-exact) across the sweep", "feature_id": null, "timestamp": "2026-07-08T04:17:28.842532+00:00"}
+[2026-07-07 23:17:28] [INFO] [prose_demotion] {"event": "PROSE_AC_DEMOTED", "criterion": "behavior: the RCCL build verifies that before/after table records latency vs ring in the medium band; a null/small result is documented, not hidden when the feature runs", "feature_id": null, "timestamp": "2026-07-08T04:17:28.842818+00:00"}
+[2026-07-07 23:17:28] [WARNING] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c failed verification checklist: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/7 criteria: File exists: src/dda_recursive_halving_ipc.cu; command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) -> command timed out after 600s: 'cd projects/rccl && ./install.sh'
+
+Failed checks: acceptance_criteria_met
+[2026-07-07 23:17:28] [ERROR] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c will be marked needs_human due to failed verification
+[2026-07-07 23:17:28] [ERROR] [run_loop] Feature 0e44d83e-4da2-42b2-a35b-871fbfea199c failed verification: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/7 criteria: File exists: src/dda_recursive_halving_ipc.cu; command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) -> command timed out after 600s: 'cd projects/rccl && ./install.sh'
+
+Failed checks: acceptance_criteria_met
+[2026-07-07 23:17:28] [INFO] [run_loop] Feature 0e44d83e (T4 - Log-round recursive-halving/circulant RS + AllReduce (lossless, low priority)) done: status=executing duration=742.3s cost=$16.8845 attempts=1
+[2026-07-07 23:17:28] [INFO] [run_loop] Bootstrap bypass granted for feature 9b8fe900 (readiness=0.56, bootstrap_attempts=0, research_iterations=0); executing once to seed research signal.
+[2026-07-07 23:17:28] [INFO] [run_loop] Executing feature 9b8fe900-f3e0-4100-bf15-79e3eafc9226: T2 - CPX/XCD/IOD chiplet-hierarchy-aware algo+protocol selection (lossless)
+[2026-07-07 23:17:28] [INFO] [run_loop] Feature 9b8fe900-f3e0-4100-bf15-79e3eafc9226: TDD mode enabled
+[2026-07-07 23:17:28] [INFO] [run_loop] Feature 9b8fe900-f3e0-4100-bf15-79e3eafc9226: Sub-agent mode enabled
+[2026-07-07 23:17:28] [INFO] [skills_installer] Installed 8 skills into /home/yelkhamr/dark-factory/rocm-systems/.claude/skills

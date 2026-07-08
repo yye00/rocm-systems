@@ -16,6 +16,7 @@ while true; do
 import sqlite3
 d=sqlite3.connect("bob.db");c=d.cursor()
 c.execute('UPDATE features SET status="pending" WHERE status IN ("failed","interrupted","gate_blocked","executing")')
+c.execute("DELETE FROM features WHERE spec_slot IS NULL OR spec_slot=''")  # F-R9-027: purge null-slot dup rows each iter
 rows=c.execute("SELECT id,status FROM features").fetchall()
 try: deps=c.execute("SELECT feature_id,depends_on_feature_id FROM feature_dependencies").fetchall()
 except Exception: deps=[]

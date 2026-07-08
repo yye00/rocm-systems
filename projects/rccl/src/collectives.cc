@@ -17,6 +17,7 @@
 #include "dda_reduce_scatter_ipc.h"
 #include "dda_all_gather_ipc.h"
 #include "dda_alltoall_ipc.h"
+#include "dda_recursive_halving_ipc.h"
 #include "sym_kernels.h"
 
 #ifdef ENABLE_ROCSHMEM
@@ -437,6 +438,21 @@ ncclResult_t ncclAllReduce_impl(const void* sendbuff, void* recvbuff, size_t cou
 
   NCCLCHECK(Recorder::instance().record(rrAllReduce, info));
 
+  // Log-round recursive-halving/doubling DDA (RCCL_RHD_ENABLE, default 0).
+  // ncclAllReduceRhdIpcEligible() returns false unless the gate is set, so this
+  // branch is a no-op relative to baseline when the feature is disabled.
+  if (ncclAllReduceRhdIpcEligible(comm, sendbuff, recvbuff, count, datatype, op)) {
+    NCCLCHECK(ncclAllReduceRhdIpc(
+        sendbuff,
+        recvbuff,
+        count,
+        datatype,
+        op,
+        comm,
+        stream));
+    return ncclSuccess;
+  }
+
   if (rcclDdaEnabled(comm, count * ncclTypeSize(datatype), 8388608) &&
       ncclAllReduceDdaIpcEligible(comm, sendbuff, recvbuff, count, datatype, op)) {
     NCCLCHECK(ncclAllReduceDdaIpc(
@@ -570,6 +586,22 @@ ncclResult_t ncclReduceScatter_impl(const void* sendbuff, void* recvbuff, size_t
     NCCLCHECK(ncclSymkInitOnce(comm));
     int symkOp = (op == ncclAvg) ? (int)ncclDevSumPostDiv : (int)ncclDevSum;
     symEligible = ncclSymkAvailable(comm, ncclFuncReduceScatter, symkOp, datatype, recvcount);
+  }
+
+  // Log-round recursive-halving DDA (RCCL_RHD_ENABLE, default 0).
+  // ncclReduceScatterRhdIpcEligible() returns false unless the gate is set, so
+  // this branch is a no-op relative to baseline when the feature is disabled.
+  if (!symEligible &&
+      ncclReduceScatterRhdIpcEligible(comm, sendbuff, recvbuff, recvcount, datatype, op)) {
+    NCCLCHECK(ncclReduceScatterRhdIpc(
+        sendbuff,
+        recvbuff,
+        recvcount,
+        datatype,
+        op,
+        comm,
+        stream));
+    return ncclSuccess;
   }
 
   if (!symEligible &&
