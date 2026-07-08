@@ -12,6 +12,7 @@
 #include "topo.h"
 #include "nccl_tuner.h"
 #include "dda_recursive_halving_ipc.h"
+#include "dda_quick_reduce_ipc.h"
 
 NCCL_PARAM(Nthreads, "NTHREADS", -2);
 NCCL_PARAM(Ll128Nthreads, "LL128_NTHREADS", -2);
@@ -1161,7 +1162,23 @@ ncclResult_t ncclTopoGetAlgoTime(struct ncclComm* comm, int coll, int algorithm,
       latCount = DIVUP(latCount * logP, comm->nRanks);
     }
   }
-  *time = lat * latCount + nBytes / (1000 * bw);
+  // QuickReduce lossy path (RCCL_QUICKREDUCE_ENABLE): every XGMI transfer
+  // carries block-quantized payload, so the effective wire byte volume is a
+  // fraction (1/compressionRatio) of the full-precision nBytes. Scale the
+  // bandwidth term for the ring model on single-node AllReduce so the selector
+  // prefers this path above the ~1 MiB crossover. Strictly gated: no-op unless
+  // QuickReduce is enabled. LOSSY, opt-in only; never affects baseline.
+  size_t effBytes = nBytes;
+  if (algorithm == NCCL_ALGO_RING && coll == ncclFuncAllReduce &&
+      comm->nNodes == 1 &&
+      (comm->nRanks == 2 || comm->nRanks == 4 || comm->nRanks == 8) &&
+      ncclQuickReduceEnabled()) {
+    const float ratio = ncclQuickReduceCompressionRatio();
+    if (ratio > 1.0f) {
+      effBytes = (size_t)((float)nBytes / ratio);
+    }
+  }
+  *time = lat * latCount + effBytes / (1000 * bw);
   return ncclSuccess;
 }
 

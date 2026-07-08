@@ -17,7 +17,9 @@
 #include "dda_reduce_scatter_ipc.h"
 #include "dda_all_gather_ipc.h"
 #include "dda_alltoall_ipc.h"
+#include "algorithms/alltoall/quant_alltoall_ipc.h"
 #include "dda_recursive_halving_ipc.h"
+#include "dda_quick_reduce_ipc.h"
 #include "sym_kernels.h"
 
 #ifdef ENABLE_ROCSHMEM
@@ -133,7 +135,11 @@ RCCL_PARAM(DdaThreshold, "DDA_THRESHOLD", (size_t)(67108864));
 // threshold for gfx942; gfx950 uses the user-configurable rcclParamDdaThreshold();
 // all other architectures return false (threshold 0).
 static bool rcclDdaEnabled(const ncclComm* comm, size_t totalBytes, size_t gfx942Default) {
-  if (!rcclParamDdaEnable() || ncclParamLaunchOrderImplicit() || ncclGroupDepth != 0 || comm->nRanks < 8 || comm->symmetricSupport) return false;
+  // Default DDA requires the full 8-rank clique. With RCCL_DDA_NRANKS_RELAX=1,
+  // 2/4-rank comms also pass this floor; per-collective eligibility (only
+  // AllReduce is relaxed) still rejects unsupported participant counts.
+  const int ddaMinRanks = ncclDdaNranksRelaxEnabled() ? 2 : 8;
+  if (!rcclParamDdaEnable() || ncclParamLaunchOrderImplicit() || ncclGroupDepth != 0 || comm->nRanks < ddaMinRanks || comm->symmetricSupport) return false;
   size_t threshold;
   if (IsArchMatch(comm->archName, "gfx942")) {
     threshold = gfx942Default;
@@ -307,6 +313,20 @@ ncclResult_t ncclAlltoAll_impl(const void* sendbuff, void* recvbuff, size_t coun
       }
       #endif // ENABLE_ROCSHMEM
 
+    // Lossy quantized (fp8, per-token scale) MoE AllToAll dispatch/combine.
+    // Gated by RCCL_QUANT_ALLTOALL_ENABLE (default 0); a pure permute with no
+    // reduction, so it shares the DDA IPC scratch/barrier but not ncclSum.
+    if (ncclQuantAllToAllDdaIpcEligible(comm, sendbuff, recvbuff, count, datatype)) {
+      NCCLCHECK(ncclQuantAllToAllDdaIpc(
+        sendbuff,
+        recvbuff,
+        count,
+        datatype,
+        comm,
+        stream));
+      return ncclSuccess;
+    }
+
     if (rcclDdaEnabled(comm, comm->nRanks * count * ncclTypeSize(datatype), 4194304) &&
         ncclAllToAllDdaIpcEligible(comm, sendbuff, recvbuff, count, datatype)) {
       NCCLCHECK(ncclAllToAllDdaIpc(
@@ -443,6 +463,22 @@ ncclResult_t ncclAllReduce_impl(const void* sendbuff, void* recvbuff, size_t cou
   // branch is a no-op relative to baseline when the feature is disabled.
   if (ncclAllReduceRhdIpcEligible(comm, sendbuff, recvbuff, count, datatype, op)) {
     NCCLCHECK(ncclAllReduceRhdIpc(
+        sendbuff,
+        recvbuff,
+        count,
+        datatype,
+        op,
+        comm,
+        stream));
+    return ncclSuccess;
+  }
+
+  // QuickReduce lossy block-quantized two-shot AllReduce (RCCL_QUICKREDUCE_ENABLE,
+  // default 0).  ncclAllReduceQuickReduceIpcEligible() returns false unless the
+  // gate is explicitly set, so this path is NEVER auto-selected on the exact
+  // ncclSum default path and baseline behavior is unperturbed when disabled.
+  if (ncclAllReduceQuickReduceIpcEligible(comm, sendbuff, recvbuff, count, datatype, op)) {
+    NCCLCHECK(ncclAllReduceQuickReduceIpc(
         sendbuff,
         recvbuff,
         count,
