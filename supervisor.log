@@ -20,3 +20,9 @@ unparked_blockers=0
 [supervisor] iter=5 completed=1 runnable=1 22:06:36
 unparked_blockers=0
 [supervisor] iter=1 completed=2 runnable=1 22:09:08
+/home/yelkhamr/dark-factory/rocm-systems/bob_supervisor.sh: line 44: 766094 Killed                  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+[supervisor] bob exited=137 completed_after=2 22:12:37
+unparked_blockers=0
+[supervisor] iter=2 completed=2 runnable=1 22:12:42
+unparked_blockers=0
+[supervisor] iter=1 completed=2 runnable=1 22:15:14
