@@ -1,0 +1,33 @@
+# RCCL tuner config — gfx942 (MI300X / MI300A, CDNA3).
+# Format (backward-compatible): colltype,minbytes,maxbytes,algorithm,protocol,
+#   channels,nNodes,nRanks[,numPipeOps,regBuff[,partitionMode,localGroup]]
+# Legacy 10-field rows are honored unconditionally. The 12-field chiplet-aware
+# rows (trailing partitionMode,localGroup) are honored ONLY when
+# RCCL_CHIPLET_TUNER_ENABLE=1; with the gate off they are ignored and selection
+# is bit-for-bit identical to the legacy tuner.
+
+# SPX (whole-GPU, 8 ranks) baseline — unchanged, legacy 10-field rows.
+allreduce,0,16383,tree,ll,1,1,8,-1,-1
+allreduce,16384,524287,ring,ll,-1,1,8,-1,-1
+allreduce,524288,1048575,ring,ll,32,1,8,-1,-1
+allreduce,1048576,17179869184,ring,ll,-1,1,8,-1,-1
+
+# CPX (per-XCD partitions) chiplet-hierarchy-aware rows. MI300X exposes 8 XCDs
+# per GPU, so a full 8-GPU node presents 64 ranks in CPX mode (localGroup=8).
+# Only honored when RCCL_CHIPLET_TUNER_ENABLE=1 (12-field format). Message-size
+# zones exploit the CDNA3 intra-GPU bandwidth hierarchy
+# (within-XCD >> XCD->IOD >> IOD->HBM):
+#   small  (<= 16 KiB): Tree + LL      — latency-bound, minimize round trips
+#   mid    (<=  1 MiB): Tree + LL128   — balance latency and payload efficiency
+#   large  (>   1 MiB): Ring + Simple  — bandwidth-bound, maximize throughput
+allreduce,0,16383,tree,ll,-1,1,64,-1,-1,cpx,8
+allreduce,16384,1048575,tree,ll128,-1,1,64,-1,-1,cpx,8
+allreduce,1048576,17179869184,ring,simple,-1,1,64,-1,-1,cpx,8
+# ReduceScatter has no Tree algorithm; zone by protocol on the ring instead.
+reducescatter,0,16383,ring,ll,-1,1,64,-1,-1,cpx,8
+reducescatter,16384,1048575,ring,ll128,-1,1,64,-1,-1,cpx,8
+reducescatter,1048576,17179869184,ring,simple,-1,1,64,-1,-1,cpx,8
+# AllGather has no Tree algorithm; zone by protocol on the ring instead.
+allgather,0,16383,ring,ll,-1,1,64,-1,-1,cpx,8
+allgather,16384,1048575,ring,ll128,-1,1,64,-1,-1,cpx,8
+allgather,1048576,17179869184,ring,simple,-1,1,64,-1,-1,cpx,8

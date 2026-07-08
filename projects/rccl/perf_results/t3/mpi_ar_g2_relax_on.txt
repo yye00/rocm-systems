@@ -1,0 +1,41 @@
+# rccl-tests version 2.18.3-develop:12b92a8ca6 rccl-headers=23004 rccl-library=23004
+# Collective test starting: all_reduce_perf_mpi
+# nThread 1 nGpus 1 minBytes 8 maxBytes 67108864 step: 2(factor) warmup iters: 1 iters: 20 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 2715448 on smci355-ccs-aus-m03-05 device  0 [0000:75:00] AMD Instinct MI355X
+#  Rank  1 Group  0 Pid 2715450 on smci355-ccs-aus-m03-05 device  1 [0000:05:00] AMD Instinct MI355X
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong  
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)          
+           8             2     float     sum      -1     8.56    0.00    0.00       0     8.25    0.00    0.00       0
+          16             4     float     sum      -1     4.94    0.00    0.00       0     4.73    0.00    0.00       0
+          32             8     float     sum      -1     4.71    0.01    0.01       0     5.23    0.01    0.01       0
+          64            16     float     sum      -1     4.70    0.01    0.01       0     4.66    0.01    0.01       0
+         128            32     float     sum      -1     5.48    0.02    0.02       0     4.64    0.03    0.03       0
+         256            64     float     sum      -1     4.76    0.05    0.05       0     5.27    0.05    0.05       0
+         512           128     float     sum      -1     4.84    0.11    0.11       0     5.17    0.10    0.10       0
+        1024           256     float     sum      -1     6.40    0.16    0.16       0     4.75    0.22    0.22       0
+        2048           512     float     sum      -1     5.33    0.38    0.38       0     5.26    0.39    0.39       0
+        4096          1024     float     sum      -1     4.89    0.84    0.84       0     4.84    0.85    0.85       0
+        8192          2048     float     sum      -1     5.78    1.42    1.42       0     5.26    1.56    1.56       0
+       16384          4096     float     sum      -1     5.74    2.86    2.86       0     5.45    3.01    3.01       0
+       32768          8192     float     sum      -1     5.76    5.69    5.69       0     6.04    5.43    5.43       0
+       65536         16384     float     sum      -1     6.10   10.75   10.75       0     5.93   11.04   11.04       0
+      131072         32768     float     sum      -1     7.12   18.41   18.41       0     7.02   18.67   18.67       0
+      262144         65536     float     sum      -1     9.29   28.22   28.22       0     9.17   28.59   28.59       0
+      524288        131072     float     sum      -1    15.09   34.75   34.75       0    14.90   35.18   35.18       0
+     1048576        262144     float     sum      -1    30.07   34.87   34.87       0    23.48   44.66   44.66       0
+     2097152        524288     float     sum      -1    40.88   51.30   51.30       0    40.93   51.24   51.24       0
+     4194304       1048576     float     sum      -1    74.46   56.33   56.33       0    74.71   56.14   56.14       0
+     8388608       2097152     float     sum      -1   142.98   58.67   58.67       0   142.91   58.70   58.70       0
+    16777216       4194304     float     sum      -1   278.31   60.28   60.28       0   278.76   60.19   60.19       0
+    33554432       8388608     float     sum      -1   549.70   61.04   61.04       0   550.23   60.98   60.98       0
+    67108864      16777216     float     sum      -1  1091.45   61.49   61.49       0  1091.52   61.48   61.48       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 20.5451 
+#
+# Collective test concluded: all_reduce_perf_mpi
+#
+

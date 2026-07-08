@@ -1,0 +1,1227 @@
+2026-07-08T06:11:03.643Z [DEBUG] MDM settings load completed in 0ms
+2026-07-08T06:11:03.656Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+2026-07-08T06:11:03.656Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.json
+2026-07-08T06:11:03.656Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.local.json
+2026-07-08T06:11:03.656Z [DEBUG] CA certs: Config fallback - globalEnv keys: , settingsEnv keys: OTEL_EXPORTER_OTLP_PROTOCOL,ANTHROPIC_API_KEY,OTEL_METRICS_EXPORTER,CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC,OTEL_RESOURCE_ATTRIBUTES,ANTHROPIC_CUSTOM_HEADERS,OTEL_TRACES_EXPORTER,OTEL_LOG_TOOL_DETAILS,OTEL_LOG_RAW_API_BODIES,OTEL_EXPORTER_OTLP_ENDPOINT,ANTHROPIC_BASE_URL,OTEL_LOG_TOOL_CONTENT,OTEL_LOG_USER_PROMPTS,ANTHROPIC_DEFAULT_SONNET_MODEL,CLAUDE_CODE_ENABLE_TELEMETRY,CLAUDE_CODE_ENHANCED_TELEMETRY_BETA,ANTHROPIC_MODEL,CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS,ANTHROPIC_DEFAULT_OPUS_MODEL,OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE,ENABLE_TOOL_SEARCH,ANTHROPIC_DEFAULT_HAIKU_MODEL,OTEL_LOGS_EXPORTER
+2026-07-08T06:11:03.657Z [DEBUG] [init] configureGlobalMTLS starting
+2026-07-08T06:11:03.657Z [DEBUG] [init] configureGlobalMTLS complete
+2026-07-08T06:11:03.657Z [DEBUG] [init] configureGlobalAgents starting
+2026-07-08T06:11:03.657Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-07-08T06:11:03.658Z [DEBUG] CA certs: Loaded 120 bundled root certificates
+2026-07-08T06:11:03.666Z [DEBUG] CA certs: Dropped 6 expired certificate(s) from system store
+2026-07-08T06:11:03.666Z [DEBUG] CA certs: Loaded 291 system CA certificates
+2026-07-08T06:11:03.666Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-07-08T06:11:03.666Z [DEBUG] [init] configureGlobalAgents complete
+2026-07-08T06:11:03.667Z [DEBUG] Error log sink initialized
+2026-07-08T06:11:03.676Z [DEBUG] Applying permission update: Adding 8 deny rule(s) to destination 'userSettings': ["Read(./.env)","Read(./.env.*)","Read(./secrets/**)","Read(./.aws/**)","Read(~/.ssh/**)","Read(./config/credentials.json)","Read(./appsettings.*.json)","Bash(rm -rf:*)"]
+2026-07-08T06:11:03.676Z [DEBUG] Applying permission update: Adding 4 ask rule(s) to destination 'userSettings': ["Bash(git push:*)","Bash(npm publish:*)","Bash(docker:*)","Bash(kubectl:*)"]
+2026-07-08T06:11:03.677Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=true, result=false
+2026-07-08T06:11:03.678Z [DEBUG] [claudeai-mcp] Disabled: API-key auth precedence active
+2026-07-08T06:11:03.678Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-07-08T06:11:03.706Z [DEBUG] Loaded 41 installed plugins from /home/yelkhamr/.claude/plugins/installed_plugins.json
+2026-07-08T06:11:03.708Z [DEBUG] Git remote URL: https://github.com/ROCm/rocm-systems.git
+2026-07-08T06:11:03.708Z [DEBUG] Parsed repository: github.com/ROCm/rocm-systems from URL: https://github.com/ROCm/rocm-systems.git
+2026-07-08T06:11:03.713Z [DEBUG] Plugin plugin-dev has no entry.skills defined
+2026-07-08T06:11:03.714Z [DEBUG] Plugin pyright-lsp has no entry.skills defined
+2026-07-08T06:11:03.714Z [DEBUG] Plugin typescript-lsp has no entry.skills defined
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin product-tracking-skills (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/product-tracking-skills/1.1.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin superpowers (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin hookify (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin security-guidance (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/security-guidance/1.0.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin ralph-wiggum (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/ralph-wiggum/1.0.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin remember (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/remember/0.1.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin ralph-loop (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/ralph-loop/1.0.0/hooks/hooks.json
+2026-07-08T06:11:03.714Z [DEBUG] Read hooks.json for plugin security-guidance (enabled=true): /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/security-guidance/656b617198e1/hooks/hooks.json
+2026-07-08T06:11:03.749Z [DEBUG] [STARTUP] Running setup()...
+2026-07-08T06:11:03.751Z [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/home/yelkhamr/.claude/skills, project=[/home/yelkhamr/dark-factory/rocm-systems/.claude/skills]
+2026-07-08T06:11:03.751Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /etc/claude-code/managed-settings.json
+2026-07-08T06:11:03.753Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.json
+2026-07-08T06:11:03.753Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.local.json
+2026-07-08T06:11:03.753Z [DEBUG] Error log sink initialized
+2026-07-08T06:11:03.755Z [DEBUG] Acquired PID lock for 2.1.198 (PID 2852621)
+2026-07-08T06:11:03.755Z [DEBUG] Acquired PID lock on running version: /home/yelkhamr/.local/share/claude/versions/2.1.198
+2026-07-08T06:11:03.755Z [DEBUG] [STARTUP] setup() completed in 6ms
+2026-07-08T06:11:03.755Z [DEBUG] Cleared CA certificates cache
+2026-07-08T06:11:03.755Z [DEBUG] Cleared mTLS configuration cache
+2026-07-08T06:11:03.755Z [DEBUG] Cleared proxy agent cache
+2026-07-08T06:11:03.755Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-07-08T06:11:03.755Z [DEBUG] CA certs: Loaded 120 bundled root certificates
+2026-07-08T06:11:03.759Z [DEBUG] CA certs: Dropped 6 expired certificate(s) from system store
+2026-07-08T06:11:03.759Z [DEBUG] CA certs: Loaded 291 system CA certificates
+2026-07-08T06:11:03.759Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-07-08T06:11:03.759Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-07-08T06:11:03.768Z [DEBUG] Failed to stat directory /etc/claude-code/.claude/commands: ENOENT: no such file or directory, statx '/etc/claude-code/.claude/commands'
+2026-07-08T06:11:03.768Z [DEBUG] Failed to stat directory /home/yelkhamr/.claude/agents: ENOENT: no such file or directory, statx '/home/yelkhamr/.claude/agents'
+2026-07-08T06:11:03.768Z [DEBUG] Failed to stat directory /etc/claude-code/.claude/agents: ENOENT: no such file or directory, statx '/etc/claude-code/.claude/agents'
+2026-07-08T06:11:03.768Z [DEBUG] Failed to stat directory /home/yelkhamr/.claude/commands: ENOENT: no such file or directory, statx '/home/yelkhamr/.claude/commands'
+2026-07-08T06:11:03.769Z [DEBUG] Found 41 plugins (37 enabled, 4 disabled)
+2026-07-08T06:11:03.770Z [DEBUG] getPluginSkills: Processing 37 enabled plugins
+2026-07-08T06:11:03.770Z [DEBUG] Checking plugin code-review: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.770Z [DEBUG] Checking plugin agent-sdk-dev: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.770Z [DEBUG] Checking plugin feature-dev: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.770Z [DEBUG] Checking plugin frontend-design: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.770Z [DEBUG] Attempting to load skills from plugin frontend-design default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/frontend-design/1.0.0/skills
+2026-07-08T06:11:03.770Z [DEBUG] Checking plugin hookify: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin hookify default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/hookify/0.1.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin plugin-dev: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin plugin-dev default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/plugin-dev/0.1.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin pr-review-toolkit: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin ralph-wiggum: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin ai: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin ai default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/pydantic-ai/0.1.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin frontend-design: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin frontend-design default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/frontend-design/656b617198e1/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin superpowers: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin superpowers default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin code-review: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin code-simplifier: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin skill-creator: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin skill-creator default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/skill-creator/656b617198e1/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin feature-dev: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin claude-md-management: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin claude-md-management default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/claude-md-management/1.0.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin ralph-loop: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin typescript-lsp: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin security-guidance: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin commit-commands: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin claude-code-setup: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin claude-code-setup default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/claude-code-setup/1.0.0/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin pr-review-toolkit: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin pyright-lsp: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin atlassian: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.771Z [DEBUG] Attempting to load skills from plugin atlassian default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/atlassian/9b52fb18e184/skills
+2026-07-08T06:11:03.771Z [DEBUG] Checking plugin plugin-dev: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin plugin-dev default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/plugin-dev/656b617198e1/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin agent-sdk-dev: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin security-guidance: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin commit-commands: skillsPath=none, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin playground: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin playground default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/playground/656b617198e1/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin qodo-skills: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin qodo-skills default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/qodo-skills/0.6.1/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin remember: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin remember default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/remember/0.1.0/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin sourcegraph: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin sourcegraph default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/sourcegraph/0.1.0/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin product-tracking-skills: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin product-tracking-skills default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/product-tracking-skills/1.1.0/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin mcp-server-dev: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin mcp-server-dev default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/mcp-server-dev/656b617198e1/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin ai-firstify: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin ai-firstify default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/ai-firstify/1.1.0/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin goodmem: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin goodmem default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/goodmem/0.1.0/skills
+2026-07-08T06:11:03.772Z [DEBUG] Checking plugin data-engineering: skillsPath=exists, skillsPaths=0 paths
+2026-07-08T06:11:03.772Z [DEBUG] Attempting to load skills from plugin data-engineering default skillsPath: /home/yelkhamr/.claude/plugins/cache/claude-plugins-official/data-engineering/0.1.0/skills
+2026-07-08T06:11:03.773Z [DEBUG] Total plugin workflows loaded: 0
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: hookify
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: ralph-wiggum
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: superpowers
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: ralph-loop
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: security-guidance
+2026-07-08T06:11:03.773Z [DEBUG] Skipping duplicate hook registration for plugin "security-guidance" from security-guidance@claude-code-plugins - already registered from another source
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: remember
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: product-tracking-skills
+2026-07-08T06:11:03.773Z [DEBUG] Loading hooks from plugin: data-engineering
+2026-07-08T06:11:03.773Z [DEBUG] Registered 13 hooks from 37 plugins
+2026-07-08T06:11:03.778Z [WARN] Missing environment variables in plugin MCP config: SOURCEGRAPH_ENDPOINT, SOURCEGRAPH_ACCESS_TOKEN
+2026-07-08T06:11:03.792Z [ERROR] Plugin MCP server error - mcp-config-invalid: MCP server sourcegraph invalid: Missing environment variables: SOURCEGRAPH_ENDPOINT, SOURCEGRAPH_ACCESS_TOKEN
+2026-07-08T06:11:03.793Z [DEBUG] Loaded 10 unique skills (10 unconditional, 0 conditional, managed: 0, user: 2, project: 8, additional: 0, legacy commands: 0)
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 3 commands from plugin ralph-wiggum default directory
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 3 commands from plugin ralph-loop default directory
+2026-07-08T06:11:03.795Z [DEBUG] Loaded 1 commands from plugin feature-dev default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 4 commands from plugin hookify default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin claude-md-management default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin code-review default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 3 commands from plugin commit-commands default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin agent-sdk-dev default directory
+2026-07-08T06:11:03.796Z [DEBUG] Loaded 1 commands from plugin plugin-dev default directory
+2026-07-08T06:11:03.796Z [WARN] Failed to parse YAML frontmatter in /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/plugin-dev/0.1.0/agents/skill-reviewer.md: YAML Parse error: Unexpected token
+2026-07-08T06:11:03.797Z [WARN] Failed to parse YAML frontmatter in /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/pr-review-toolkit/1.0.0/agents/code-simplifier.md: YAML Parse error: Unexpected token
+2026-07-08T06:11:03.797Z [WARN] Failed to parse YAML frontmatter in /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/plugin-dev/0.1.0/agents/plugin-validator.md: YAML Parse error: Unexpected token
+2026-07-08T06:11:03.797Z [DEBUG] Loaded 1 agents from plugin hookify default directory
+2026-07-08T06:11:03.797Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-07-08T06:11:03.797Z [DEBUG] Loaded 3 commands from plugin commit-commands default directory
+2026-07-08T06:11:03.797Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 1 agents from plugin product-tracking-skills default directory
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 1 commands from plugin pr-review-toolkit default directory
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 2 agents from plugin agent-sdk-dev default directory
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 2 commands from plugin sourcegraph default directory
+2026-07-08T06:11:03.798Z [DEBUG] Total plugin commands loaded: 29
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 3 agents from plugin feature-dev default directory
+2026-07-08T06:11:03.798Z [DEBUG] Loaded 7 agents from plugin pr-review-toolkit default directory
+2026-07-08T06:11:03.799Z [DEBUG] Loaded 1 agents from plugin code-simplifier default directory
+2026-07-08T06:11:03.799Z [WARN] Failed to parse YAML frontmatter in /home/yelkhamr/.claude/plugins/cache/claude-code-plugins/plugin-dev/0.1.0/agents/agent-creator.md: YAML Parse error: Unexpected token
+2026-07-08T06:11:03.799Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-07-08T06:11:03.799Z [DEBUG] Loaded 3 agents from plugin plugin-dev default directory
+2026-07-08T06:11:03.799Z [DEBUG] Loaded 7 agents from plugin pr-review-toolkit default directory
+2026-07-08T06:11:03.799Z [DEBUG] Total plugin agents loaded: 33
+2026-07-08T06:11:03.800Z [DEBUG] Loaded 1 skills from plugin frontend-design default directory
+2026-07-08T06:11:03.800Z [DEBUG] Loaded 1 skills from plugin hookify default directory
+2026-07-08T06:11:03.800Z [DEBUG] Loaded 1 skills from plugin frontend-design default directory
+2026-07-08T06:11:03.801Z [DEBUG] Loaded 1 skills from plugin skill-creator default directory
+2026-07-08T06:11:03.801Z [DEBUG] Loaded 1 skills from plugin ai default directory
+2026-07-08T06:11:03.802Z [DEBUG] Loaded 1 skills from plugin playground default directory
+2026-07-08T06:11:03.802Z [DEBUG] Loaded 1 skills from plugin remember default directory
+2026-07-08T06:11:03.802Z [DEBUG] Loaded 1 skills from plugin sourcegraph default directory
+2026-07-08T06:11:03.803Z [DEBUG] Loaded 1 skills from plugin ai-firstify default directory
+2026-07-08T06:11:03.803Z [DEBUG] Loaded 1 skills from plugin claude-md-management default directory
+2026-07-08T06:11:03.803Z [DEBUG] Loaded 14 skills from plugin superpowers default directory
+2026-07-08T06:11:03.803Z [DEBUG] Loaded 2 skills from plugin qodo-skills default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 5 skills from plugin atlassian default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 3 skills from plugin goodmem default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 1 skills from plugin claude-code-setup default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 7 skills from plugin product-tracking-skills default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 7 skills from plugin plugin-dev default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 7 skills from plugin plugin-dev default directory
+2026-07-08T06:11:03.804Z [DEBUG] Loaded 3 skills from plugin mcp-server-dev default directory
+2026-07-08T06:11:03.805Z [DEBUG] Loaded 20 skills from plugin data-engineering default directory
+2026-07-08T06:11:03.806Z [DEBUG] Total plugin skills loaded: 79 (0 duplicate/user-owned entries skipped)
+2026-07-08T06:11:03.806Z [DEBUG] getSkills returning: 10 skill dir commands, 79 plugin skills, 25 bundled skills, 0 builtin plugin skills
+2026-07-08T06:11:03.808Z [DEBUG] [STARTUP] Commands and agents loaded in 49ms
+2026-07-08T06:11:03.809Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-07-08T06:11:03.809Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-07-08T06:11:03.809Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-07-08T06:11:03.809Z [DEBUG] Starting background startup prefetches
+2026-07-08T06:11:03.809Z [DEBUG] [Bootstrap] Skipped: Nonessential traffic disabled
+2026-07-08T06:11:03.810Z [DEBUG] [STARTUP] MCP configs resolved in 115ms (awaited at +132ms)
+2026-07-08T06:11:03.811Z [DEBUG] All plugins already exist, skipping migration
+2026-07-08T06:11:03.811Z [DEBUG] Cleared CA certificates cache
+2026-07-08T06:11:03.811Z [DEBUG] Cleared mTLS configuration cache
+2026-07-08T06:11:03.811Z [DEBUG] Cleared proxy agent cache
+2026-07-08T06:11:03.811Z [DEBUG] CA certs: stores=bundled,system, extraCertsPath=undefined
+2026-07-08T06:11:03.812Z [DEBUG] CA certs: Loaded 120 bundled root certificates
+2026-07-08T06:11:03.818Z [DEBUG] CA certs: Dropped 6 expired certificate(s) from system store
+2026-07-08T06:11:03.818Z [DEBUG] CA certs: Loaded 291 system CA certificates
+2026-07-08T06:11:03.818Z [DEBUG] mTLS: Creating HTTPS agent with custom certificates
+2026-07-08T06:11:03.818Z [DEBUG] Initialized versioned plugins system with 41 plugins
+2026-07-08T06:11:03.821Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:03.822Z [DEBUG] [MCP] --mcp-config servers running fully async (nonblocking)
+2026-07-08T06:11:03.822Z [DEBUG] [MCP] claude.ai connectors running fully async (nonblocking)
+2026-07-08T06:11:03.823Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-07-08T06:11:03.823Z [DEBUG] [3P telemetry] isTelemetryEnabled=true (CLAUDE_CODE_ENABLE_TELEMETRY=1)
+2026-07-08T06:11:03.823Z [DEBUG] [3P telemetry] getOtlpReaders: types=["otlp"], interval=60000, protocol=http/protobuf, endpoint=https://collector.slug.amd.com
+2026-07-08T06:11:03.830Z [DEBUG] [3P telemetry] getOtlpLogExporters: types=["otlp"], protocol=http/protobuf, endpoint=https://collector.slug.amd.com
+2026-07-08T06:11:03.830Z [DEBUG] [auto-mode] verifyAutoModeGateAccess: enabledState=opt-in disabledBySettings=false model=Claude-Opus-4.7 modelSupported=false disableFastModeBreakerFires=false carouselAvailable=false canEnterAuto=false
+2026-07-08T06:11:03.830Z [WARN] auto mode disabled: model Claude-Opus-4.7 does not support auto mode
+2026-07-08T06:11:03.830Z [DEBUG] [auto-mode] kickOutOfAutoIfNeeded applying: ctx.mode=bypassPermissions ctx.prePlanMode=undefined reason=model
+2026-07-08T06:11:03.835Z [DEBUG] [3P telemetry] Created 1 log exporter(s)
+2026-07-08T06:11:03.835Z [DEBUG] [3P telemetry] Event logger set successfully
+2026-07-08T06:11:03.841Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-07-08T06:11:03.844Z [DEBUG] Loaded 1 LSP server(s) from plugin: typescript-lsp
+2026-07-08T06:11:03.844Z [DEBUG] Loaded 1 LSP server(s) from plugin: pyright-lsp
+2026-07-08T06:11:03.844Z [DEBUG] Total LSP servers loaded: 2
+2026-07-08T06:11:03.844Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 2 server(s)
+2026-07-08T06:11:03.845Z [DEBUG] LSP manager initialized with 2 servers
+2026-07-08T06:11:03.845Z [DEBUG] LSP server manager initialized successfully
+2026-07-08T06:11:03.845Z [DEBUG] Queued notification handler for plugin:typescript-lsp:typescript.textDocument/publishDiagnostics (connection not ready)
+2026-07-08T06:11:03.845Z [DEBUG] Registered diagnostics handler for plugin:typescript-lsp:typescript
+2026-07-08T06:11:03.845Z [DEBUG] Queued notification handler for plugin:pyright-lsp:pyright.textDocument/publishDiagnostics (connection not ready)
+2026-07-08T06:11:03.845Z [DEBUG] Registered diagnostics handler for plugin:pyright-lsp:pyright
+2026-07-08T06:11:03.845Z [DEBUG] LSP notification handlers registered successfully for all 2 server(s)
+2026-07-08T06:11:03.848Z [DEBUG] Prior session exited uncleanly: 8f632c1c-adc5-47d1-a524-22b4c3ff8e40 (v2.1.198)
+2026-07-08T06:11:03.857Z [DEBUG] Hooks: Config-based async hook, backgrounding process async_hook_2852989
+2026-07-08T06:11:03.857Z [DEBUG] Hooks: Registering async hook async_hook_2852989 (SessionStart:startup) with timeout 600000ms
+2026-07-08T06:11:03.859Z [DEBUG] Watching for changes in skill/command directories: /home/yelkhamr/.claude/skills, /home/yelkhamr/dark-factory/rocm-systems/.claude/skills...
+2026-07-08T06:11:03.861Z [DEBUG] Watching for changes in setting files /home/yelkhamr/.claude/settings.json, /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.json, /home/yelkhamr/dark-factory/rocm-systems/.claude/settings.local.json...
+2026-07-08T06:11:03.879Z [DEBUG] MCP server "plugin:sourcegraph:sourcegraph": Missing environment variables: SOURCEGRAPH_ENDPOINT
+2026-07-08T06:11:03.879Z [ERROR] MCP server "plugin:sourcegraph:sourcegraph" Missing environment variables: SOURCEGRAPH_ENDPOINT
+2026-07-08T06:11:03.900Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:03.900Z [DEBUG] "Hook SessionStart:startup (SessionStart) success:\n{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"SessionStart\",\n    \"additionalContext\": \"<EXTREMELY_IMPORTANT>\\nYou have superpowers.\\n\\n**Below is the full content of your 'superpowers:using-superpowers' skill - your introduction to using skills. For all other skills, use the 'Skill' tool:**\\n\\n---\\nname: using-superpowers\\ndescription: Use when starting any conversation - establishes how to find and use skills, requiring Skill tool invocation before ANY response including clarifying questions\\n---\\n\\n<SUBAGENT-STOP>\\nIf you were dispatched as a subagent to execute a specific task, skip this skill.\\n</SUBAGENT-STOP>\\n\\n<EXTREMELY-IMPORTANT>\\nIf you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.\\n\\nIF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.\\n\\nThis is not negotiable. This is not optional. You cannot rationalize your way out of this.\\n</EXTREMELY-IMPORTANT>\\n\\n## Instruction Priority\\n\\nSuperpowers skills override default system prompt behavior, but **user instructions always take precedence**:\\n\\n1. **User's explicit instructions** (CLAUDE.md, GEMINI.md, AGENTS.md, direct requests) — highest priority\\n2. **Superpowers skills** — override default system behavior where they conflict\\n3. **Default system prompt** — lowest priority\\n\\nIf CLAUDE.md, GEMINI.md, or AGENTS.md says \\\"don't use TDD\\\" and a skill says \\\"always use TDD,\\\" follow the user's instructions. The user is in control.\\n\\n## How to Access Skills\\n\\n**In Claude Code:** Use the `Skill` tool. When you invoke a skill, its content is loaded and presented to you—follow it directly. Never use the Read tool on skill files.\\n\\n**In Copilot CLI:** Use the `skill` tool. Skills are auto-discovered from installed plugins. The `skill` tool works the same as Claude Code's `Skill` tool.\\n\\n**In Gemini CLI:** Skills activate via the `activate_skill` tool. Gemini loads skill metadata at session start and activates the full content on demand.\\n\\n**In other environments:** Check your platform's documentation for how skills are loaded.\\n\\n## Platform Adaptation\\n\\nSkills use Claude Code tool names. Non-CC platforms: see `references/copilot-tools.md` (Copilot CLI), `references/codex-tools.md` (Codex) for tool equivalents. Gemini CLI users get the tool mapping loaded automatically via GEMINI.md.\\n\\n# Using Skills\\n\\n## The Rule\\n\\n**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.\\n\\n```dot\\ndigraph skill_flow {\\n    \\\"User message received\\\" [shape=doublecircle];\\n    \\\"About to EnterPlanMode?\\\" [shape=doublecircle];\\n    \\\"Already brainstormed?\\\" [shape=diamond];\\n    \\\"Invoke brainstorming skill\\\" [shape=box];\\n    \\\"Might any skill apply?\\\" [shape=diamond];\\n    \\\"Invoke Skill tool\\\" [shape=box];\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" [shape=box];\\n    \\\"Has checklist?\\\" [shape=diamond];\\n    \\\"Create TodoWrite todo per item\\\" [shape=box];\\n    \\\"Follow skill exactly\\\" [shape=box];\\n    \\\"Respond (including clarifications)\\\" [shape=doublecircle];\\n\\n    \\\"About to EnterPlanMode?\\\" -> \\\"Already brainstormed?\\\";\\n    \\\"Already brainstormed?\\\" -> \\\"Invoke brainstorming skill\\\" [label=\\\"no\\\"];\\n    \\\"Already brainstormed?\\\" -> \\\"Might any skill apply?\\\" [label=\\\"yes\\\"];\\n    \\\"Invoke brainstorming skill\\\" -> \\\"Might any skill apply?\\\";\\n\\n    \\\"User message received\\\" -> \\\"Might any skill apply?\\\";\\n    \\\"Might any skill apply?\\\" -> \\\"Invoke Skill tool\\\" [label=\\\"yes, even 1%\\\"];\\n    \\\"Might any skill apply?\\\" -> \\\"Respond (including clarifications)\\\" [label=\\\"definitely not\\\"];\\n    \\\"Invoke Skill tool\\\" -> \\\"Announce: 'Using [skill] to [purpose]'\\\";\\n    \\\"Announce: 'Using [skill] to [purpose]'\\\" -> \\\"Has checklist?\\\";\\n    \\\"Has checklist?\\\" -> \\\"Create TodoWrite todo per item\\\" [label=\\\"yes\\\"];\\n    \\\"Has checklist?\\\" -> \\\"Follow skill exactly\\\" [label=\\\"no\\\"];\\n    \\\"Create TodoWrite todo per item\\\" -> \\\"Follow skill exactly\\\";\\n}\\n```\\n\\n## Red Flags\\n\\nThese thoughts mean STOP—you're rationalizing:\\n\\n| Thought | Reality |\\n|---------|---------|\\n| \\\"This is just a simple question\\\" | Questions are tasks. Check for skills. |\\n| \\\"I need more context first\\\" | Skill check comes BEFORE clarifying questions. |\\n| \\\"Let me explore the codebase first\\\" | Skills tell you HOW to explore. Check first. |\\n| \\\"I can check git/files quickly\\\" | Files lack conversation context. Check for skills. |\\n| \\\"Let me gather information first\\\" | Skills tell you HOW to gather information. |\\n| \\\"This doesn't need a formal skill\\\" | If a skill exists, use it. |\\n| \\\"I remember this skill\\\" | Skills evolve. Read current version. |\\n| \\\"This doesn't count as a task\\\" | Action = task. Check for skills. |\\n| \\\"The skill is overkill\\\" | Simple things become complex. Use it. |\\n| \\\"I'll just do this one thing first\\\" | Check BEFORE doing anything. |\\n| \\\"This feels productive\\\" | Undisciplined action wastes time. Skills prevent this. |\\n| \\\"I know what that means\\\" | Knowing the concept ≠ using the skill. Invoke it. |\\n\\n## Skill Priority\\n\\nWhen multiple skills could apply, use this order:\\n\\n1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task\\n2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution\\n\\n\\\"Let's build X\\\" → brainstorming first, then implementation skills.\\n\\\"Fix this bug\\\" → debugging first, then domain-specific skills.\\n\\n## Skill Types\\n\\n**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.\\n\\n**Flexible** (patterns): Adapt principles to context.\\n\\nThe skill itself tells you which.\\n\\n## User Instructions\\n\\nInstructions say WHAT, not HOW. \\\"Add X\\\" or \\\"Fix Y\\\" doesn't mean skip workflows.\\n\\n\\n</EXTREMELY_IMPORTANT>\"\n  }\n}\n"
+2026-07-08T06:11:03.901Z [DEBUG] Hook SessionStart ("${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd" session-start) provided additionalContext (5632 chars)
+2026-07-08T06:11:03.914Z [DEBUG] Ripgrep first use test: PASSED (mode=embedded, path=/home/yelkhamr/.local/share/claude/versions/2.1.198)
+2026-07-08T06:11:03.915Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:03.915Z [DEBUG] "Hook SessionStart:startup (SessionStart) success:\n=== REMEMBER ===\nHistory in .remember/: now.md (buffer), today-*.md (daily), recent.md (7d), archive.md (old), core-memories.md (key moments). Search on user request.\n\n=== MEMORY ===\n--- now.md ---\n\n## F001 a105413b baseline BEFORE capture — COMPLETE (2026-07-07)\n- librccl.so rebuilt (gfx950, 29MB) via install.sh --amdgpu_targets gfx950; earlier build dir had no .so (OOM-killed rebuild).\n- LESSON: never run two install.sh in the same rccl build/ tree — they race on fmt FetchContent and break CMake configure (\"Build step for fmt failed\"). Kill duplicates, then a single clean build reuses cached device .o files.\n- topo_expl -m 59 confirms 8xgfx950 XGMI clique (nranks=8, 56 max channels). topo_expl_impl.cpp fix (zero cpu host_hash) required for gfx950 fixture.\n- All 5 sweeps (allreduce half/bf16, reducescatter, allgather, alltoall) captured 8B..2GiB, exit=0, #wrong==0, saved to projects/rccl/perf_results/baseline/.\n- Size ceiling 2G (not 8G AC): GPU3 has external vLLM tenant occupying ~293GB; -e 4G/8G OOM. Documented in ENV.txt.\n\n## T4 0e44d83e recursive-halving/doubling DDA (RHD) — COMPLETE (2026-07-07)\n- LESSON (CRITICAL for any DDA/IPC feature): DDA IPC paths (RHD, dda_all_reduce, dda_reduce_scatter, etc.) are SKIPPED when comm is in directMode. ncclTransportCheckP2pType sets directMode=1 whenever two local ranks share a pid — i.e. any single-process `rccl-tests -g 8` run. ncclDdaIpcCommInit then skips scratch/barrier alloc, so gate-on == gate-off (both fall back to ring). To honestly measure ANY DDA feature you MUST run 1 process per GPU: build rccl-tests with `make MPI=1 NAME_SUFFIX=_mpi GPU_TARGETS=gfx950 MPI_HOME=/usr/lib/x86_64-linux-gnu NCCL_HOME=<rccl>/build/release CUSTOM_RCCL_LIB=<same>` then `mpirun -np 8 <coll>_perf_mpi -g 1`. Verify engagement via NCCL_DEBUG=INFO NCCL_DEBUG_SUBSYS=COLL,INIT -> expect \"RCCL RHD ...\" on all 8 ranks and \"directMode 0\".\n- SETUP: libopenmpi-dev was not installed; `sudo apt-get install -y libopenmpi-dev` (passwordless sudo available). Headers land at /usr/lib/x86_64-linux-gnu/openmpi/include/mpi.h, libs at .../openmpi/lib — matches rccl-tests src/Makefile MPI paths.\n- RESULT (honest, negative): RHD is bit-exact (#wrong==0, fp32/fp16/bf16) but ~5-6x SLOWER than ring/tree on 8xMI355X XGMI clique across 256K-64M (AR 64M 379->61 GB/s, RS 361->61). Cause: full XGMI clique is bandwidth-bound not latency-bound, so RHD's fewer-rounds bet doesn't pay; extra IPC-scratch copy + fine-grained IPC round-trips dominate. Left default-off (RCCL_RHD_ENABLE=0), NOT force-enabled. Report: projects/rccl/perf_results/T4_rhd.md; raw MPI sweeps in perf_results/t4/mpi_*.txt. Single-process t4/{ar,rs}_{off,on}.txt are stale (RHD never engaged).\n- Enum: RCCL_RECURSIVE_HALVING added at rccl_common.h:63 (after RCCL_SYMMETRIC, before RCCL_ALGO_COUNT) — RCCL-local, doesn't perturb NCCL enum. tuning.cc latCount term is gated on ncclRhdEnabled() so it's a no-op when off.\n\n\n"
+2026-07-08T06:11:03.924Z [DEBUG] [ScheduledTasks] scheduler start() — enabled=false, hasTasks=false
+2026-07-08T06:11:03.927Z [WARN] Missing environment variables in plugin MCP config: SOURCEGRAPH_ENDPOINT, SOURCEGRAPH_ACCESS_TOKEN
+2026-07-08T06:11:03.936Z [ERROR] Plugin MCP server error - mcp-config-invalid: MCP server sourcegraph invalid: Missing environment variables: SOURCEGRAPH_ENDPOINT, SOURCEGRAPH_ACCESS_TOKEN
+2026-07-08T06:11:03.936Z [DEBUG] Failed to stat directory /etc/claude-code/.claude/output-styles: ENOENT: no such file or directory, statx '/etc/claude-code/.claude/output-styles'
+2026-07-08T06:11:03.936Z [DEBUG] Failed to stat directory /home/yelkhamr/.claude/output-styles: ENOENT: no such file or directory, statx '/home/yelkhamr/.claude/output-styles'
+2026-07-08T06:11:03.937Z [DEBUG] Total plugin output styles loaded: 0
+2026-07-08T06:11:03.938Z [DEBUG] act_dont_rederive_arm_active source=growthbook
+2026-07-08T06:11:03.938Z [DEBUG] installPluginsForHeadless: starting
+2026-07-08T06:11:03.941Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:03.941Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:03.941Z [DEBUG] Hooks: Found 1 total hooks in registry
+2026-07-08T06:11:03.942Z [DEBUG] Sending 132 skills via attachment (initial)
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "sourcegraph:sg-file" (userFacingName="sg-file")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "sourcegraph:sg-search" (userFacingName="sg-search")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "frontend-design:frontend-design" (userFacingName="frontend-design")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "hookify:writing-rules" (userFacingName="Writing Hookify Rules")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:agent-development" (userFacingName="Agent Development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:command-development" (userFacingName="Command Development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:hook-development" (userFacingName="Hook Development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:mcp-integration" (userFacingName="MCP Integration")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-settings" (userFacingName="Plugin Settings")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-structure" (userFacingName="Plugin Structure")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:skill-development" (userFacingName="Skill Development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "ai:building-pydantic-ai-agents" (userFacingName="building-pydantic-ai-agents")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "frontend-design:frontend-design" (userFacingName="frontend-design")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:brainstorming" (userFacingName="brainstorming")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:dispatching-parallel-agents" (userFacingName="dispatching-parallel-agents")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:executing-plans" (userFacingName="executing-plans")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:finishing-a-development-branch" (userFacingName="finishing-a-development-branch")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:receiving-code-review" (userFacingName="receiving-code-review")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:requesting-code-review" (userFacingName="requesting-code-review")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:subagent-driven-development" (userFacingName="subagent-driven-development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:systematic-debugging" (userFacingName="systematic-debugging")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:test-driven-development" (userFacingName="test-driven-development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:using-git-worktrees" (userFacingName="using-git-worktrees")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:using-superpowers" (userFacingName="using-superpowers")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:verification-before-completion" (userFacingName="verification-before-completion")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:writing-plans" (userFacingName="writing-plans")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "superpowers:writing-skills" (userFacingName="writing-skills")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "skill-creator:skill-creator" (userFacingName="skill-creator")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "claude-md-management:claude-md-improver" (userFacingName="claude-md-improver")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "claude-code-setup:claude-automation-recommender" (userFacingName="claude-automation-recommender")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "atlassian:capture-tasks-from-meeting-notes" (userFacingName="capture-tasks-from-meeting-notes")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "atlassian:generate-status-report" (userFacingName="generate-status-report")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "atlassian:search-company-knowledge" (userFacingName="search-company-knowledge")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "atlassian:spec-to-backlog" (userFacingName="spec-to-backlog")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "atlassian:triage-issue" (userFacingName="triage-issue")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:agent-development" (userFacingName="agent-development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:command-development" (userFacingName="command-development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:hook-development" (userFacingName="hook-development")
+2026-07-08T06:11:03.942Z [DEBUG] Skill prompt: showing "plugin-dev:mcp-integration" (userFacingName="mcp-integration")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-settings" (userFacingName="plugin-settings")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "plugin-dev:plugin-structure" (userFacingName="plugin-structure")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "plugin-dev:skill-development" (userFacingName="skill-development")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "playground:playground" (userFacingName="playground")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "qodo-skills:qodo-get-rules" (userFacingName="qodo-get-rules")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "qodo-skills:qodo-pr-resolver" (userFacingName="qodo-pr-resolver")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "remember:remember" (userFacingName="remember")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "sourcegraph:searching-sourcegraph" (userFacingName="searching-sourcegraph")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-audit-current-tracking" (userFacingName="product-tracking-audit-current-tracking")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-business-case" (userFacingName="product-tracking-business-case")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-design-tracking-plan" (userFacingName="product-tracking-design-tracking-plan")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-generate-implementation-guide" (userFacingName="product-tracking-generate-implementation-guide")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-implement-tracking" (userFacingName="product-tracking-implement-tracking")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-instrument-new-feature" (userFacingName="product-tracking-instrument-new-feature")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "product-tracking-skills:product-tracking-model-product" (userFacingName="product-tracking-model-product")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "mcp-server-dev:build-mcp-app" (userFacingName="build-mcp-app")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "mcp-server-dev:build-mcp-server" (userFacingName="build-mcp-server")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "mcp-server-dev:build-mcpb" (userFacingName="build-mcpb")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "ai-firstify:ai-firstify" (userFacingName="ai-firstify")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:airflow" (userFacingName="airflow")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:airflow-hitl" (userFacingName="airflow-hitl")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:airflow-plugins" (userFacingName="airflow-plugins")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:analyzing-data" (userFacingName="analyzing-data")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:annotating-task-lineage" (userFacingName="annotating-task-lineage")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:authoring-dags" (userFacingName="authoring-dags")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:checking-freshness" (userFacingName="checking-freshness")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:cosmos-dbt-core" (userFacingName="cosmos-dbt-core")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:cosmos-dbt-fusion" (userFacingName="cosmos-dbt-fusion")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:creating-openlineage-extractors" (userFacingName="creating-openlineage-extractors")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:debugging-dags" (userFacingName="debugging-dags")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:deploying-airflow" (userFacingName="deploying-airflow")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:managing-astro-local-env" (userFacingName="managing-astro-local-env")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:migrating-airflow-2-to-3" (userFacingName="migrating-airflow-2-to-3")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:profiling-tables" (userFacingName="profiling-tables")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:setting-up-astro-project" (userFacingName="setting-up-astro-project")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:testing-dags" (userFacingName="testing-dags")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:tracing-downstream-lineage" (userFacingName="tracing-downstream-lineage")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:tracing-upstream-lineage" (userFacingName="tracing-upstream-lineage")
+2026-07-08T06:11:03.943Z [DEBUG] Skill prompt: showing "data-engineering:warehouse-init" (userFacingName="warehouse-init")
+2026-07-08T06:11:03.943Z [WARN] Skill listing over budget: 132 skills, 39357 chars > 8000 budget — descriptions will be truncated. Run /doctor for details.
+2026-07-08T06:11:03.944Z [DEBUG] Hooks: Checking hook async_hook_2852989 (SessionStart:startup) - attachmentSent: false, stdout length: 0
+2026-07-08T06:11:03.944Z [DEBUG] Hooks: Hook shell status completed
+2026-07-08T06:11:03.944Z [DEBUG] Hooks: Processing 1 lines of stdout for async_hook_2852989
+2026-07-08T06:11:03.944Z [DEBUG] Hooks: async_hook_2852989 (SessionStart:startup) produced no response payload — skipping attachment
+2026-07-08T06:11:03.944Z [DEBUG] Invalidating session env cache after SessionStart hook completed
+2026-07-08T06:11:03.944Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:11:03.944Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:03.961Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:03.961Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:03.961Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:03.961Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:03.962Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:03.962Z [DEBUG] "Hook UserPromptSubmit (UserPromptSubmit) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:03.976Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:03.982Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:03.992Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:03.992Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:03.993Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:03.994Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:03.994Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:03.994Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:03.995Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:03.995Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:03.996Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:05.058Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:05.058Z [DEBUG] [API:timing] first byte after 1064ms
+2026-07-08T06:11:08.391Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:08.391Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:08.391Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:08.392Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:08.392Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:08.409Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_015bMA827Qu2n3VXEF3FVABr permissionDecisionMs=15
+2026-07-08T06:11:08.411Z [DEBUG] Creating shell snapshot for bash (/bin/bash)
+2026-07-08T06:11:08.411Z [DEBUG] Looking for shell config file: /home/yelkhamr/.bashrc
+2026-07-08T06:11:08.412Z [DEBUG] Snapshots directory: /home/yelkhamr/.claude/shell-snapshots
+2026-07-08T06:11:08.418Z [DEBUG] Creating snapshot at: /home/yelkhamr/.claude/shell-snapshots/snapshot-bash-1783491068412-9uqeg5.sh
+2026-07-08T06:11:08.418Z [DEBUG] Execution timeout: 10000ms
+2026-07-08T06:11:08.419Z [DEBUG] Spawn-env probe captured 52 keys
+2026-07-08T06:11:08.552Z [DEBUG] Shell snapshot created successfully (8802 bytes)
+2026-07-08T06:11:08.553Z [DEBUG] No session environment scripts found
+2026-07-08T06:11:08.553Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:09.139Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:09.139Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:09.139Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:09.140Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:09.140Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:09.151Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01PT7x9tXS6jx7s2SGpikNCb permissionDecisionMs=10
+2026-07-08T06:11:09.153Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:09.190Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01PT7x9tXS6jx7s2SGpikNCb outcome=ok durationMs=39
+2026-07-08T06:11:09.221Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:09.222Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:09.222Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:09.225Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:09.225Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:09.238Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:10.499Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_015bMA827Qu2n3VXEF3FVABr outcome=ok durationMs=2090
+2026-07-08T06:11:10.529Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:10.529Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:10.529Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:10.533Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:10.533Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:10.549Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:10.558Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:10.558Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:10.558Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:10.558Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:10.560Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:10.561Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:10.562Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:10.562Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:10.563Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:10.563Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:10.563Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:10.563Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:10.563Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:10.565Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:11.799Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:11.799Z [DEBUG] [API:timing] first byte after 1236ms
+2026-07-08T06:11:15.711Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:15.711Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:15.711Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:15.712Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:15.712Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:15.724Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01HRL1qm4zbgLgmUMEGo5htd permissionDecisionMs=11
+2026-07-08T06:11:15.728Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:16.051Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:11:16.053Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01HRL1qm4zbgLgmUMEGo5htd outcome=ok durationMs=329
+2026-07-08T06:11:16.082Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:16.082Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:16.082Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:16.086Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:16.087Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:16.099Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:16.347Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:16.348Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:16.348Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:16.351Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:16.351Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:16.362Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01S4JTAMFZyhPizewfC8Xcw1 permissionDecisionMs=9
+2026-07-08T06:11:16.363Z [DEBUG] No session environment scripts found
+2026-07-08T06:11:16.364Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:16.400Z [WARN] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01S4JTAMFZyhPizewfC8Xcw1 outcome=error durationMs=38
+2026-07-08T06:11:16.400Z [DEBUG] Bash tool error (38ms): Shell command failed
+2026-07-08T06:11:16.405Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:16.405Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:16.405Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:16.405Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:16.406Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:16.407Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:16.407Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:16.407Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:16.408Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:16.408Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:16.408Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:16.408Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:16.408Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:16.410Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:18.143Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:18.143Z [DEBUG] [API:timing] first byte after 1735ms
+2026-07-08T06:11:22.976Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:22.976Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:22.977Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:22.979Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:22.980Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:22.987Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01FSFa64rgFxMzXxWAynML9Z permissionDecisionMs=6
+2026-07-08T06:11:22.989Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:23.024Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01FSFa64rgFxMzXxWAynML9Z outcome=ok durationMs=37
+2026-07-08T06:11:23.054Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:23.054Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:23.054Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:23.056Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:23.056Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:23.073Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:23.081Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:23.081Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:23.081Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:23.082Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:23.083Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:23.085Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:23.085Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:23.085Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:23.086Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:23.086Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:23.086Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:23.087Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:23.087Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:23.089Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:24.605Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:24.605Z [DEBUG] [API:timing] first byte after 1519ms
+2026-07-08T06:11:28.904Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:28.905Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:28.905Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:28.908Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:28.908Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:28.921Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01HVtgRHqdBzf9F9PKijcYsG permissionDecisionMs=10
+2026-07-08T06:11:28.923Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:28.967Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01HVtgRHqdBzf9F9PKijcYsG outcome=ok durationMs=45
+2026-07-08T06:11:28.996Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:28.996Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:28.997Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:29.000Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:29.000Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:29.000Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:30.593Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:30.593Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:30.593Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:30.596Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:30.596Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:30.604Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_019VNED5AVfB2wbcQed7DmX1 permissionDecisionMs=7
+2026-07-08T06:11:30.606Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:30.639Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_019VNED5AVfB2wbcQed7DmX1 outcome=ok durationMs=35
+2026-07-08T06:11:30.660Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:30.660Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:30.660Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:30.661Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:30.661Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:30.684Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:30.693Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:30.693Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:30.693Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:30.694Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:30.697Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:30.699Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:30.699Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:30.700Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:30.701Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:30.701Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:30.701Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:30.702Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:30.702Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:30.705Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:31.727Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:31.727Z [DEBUG] [API:timing] first byte after 1025ms
+2026-07-08T06:11:34.213Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:34.213Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:34.213Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:34.216Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:34.216Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:34.223Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01VzHxCQ3si2ygda6dTH8jEG permissionDecisionMs=6
+2026-07-08T06:11:34.224Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:34.254Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01VzHxCQ3si2ygda6dTH8jEG outcome=ok durationMs=31
+2026-07-08T06:11:34.283Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:34.283Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:34.283Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:34.286Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:34.286Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:34.301Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:34.311Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:34.311Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:34.311Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:34.311Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:34.313Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:34.314Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:34.314Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:34.315Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:34.316Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:34.316Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:34.316Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:34.316Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:34.317Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:34.319Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:35.506Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:35.506Z [DEBUG] [API:timing] first byte after 1190ms
+2026-07-08T06:11:37.783Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:37.783Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:37.783Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:37.783Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:37.784Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:37.788Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_012Q9xEbnXmsemigyYmR73Po permissionDecisionMs=3
+2026-07-08T06:11:37.789Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:38.941Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_012Q9xEbnXmsemigyYmR73Po outcome=ok durationMs=1153
+2026-07-08T06:11:38.970Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:38.971Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:38.971Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:38.974Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:38.974Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:39.017Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:39.026Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:39.026Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:39.027Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:39.027Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:39.028Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:39.029Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:39.030Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:39.030Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:39.031Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:39.031Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:39.031Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:39.031Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:39.031Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:39.034Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:40.484Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:40.484Z [DEBUG] [API:timing] first byte after 1453ms
+2026-07-08T06:11:43.002Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:43.002Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:43.002Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:43.004Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:43.004Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:43.009Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01MCkRhVXdRFcQc2FTHLthpn permissionDecisionMs=4
+2026-07-08T06:11:43.010Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:43.038Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01MCkRhVXdRFcQc2FTHLthpn outcome=ok durationMs=29
+2026-07-08T06:11:43.067Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:43.068Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:43.068Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:43.071Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:43.071Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:43.091Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:43.102Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:43.102Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:43.102Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:43.102Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:43.103Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:43.104Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:43.105Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:43.105Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:43.106Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:43.106Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:43.106Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:43.106Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:43.107Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:43.109Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:44.218Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:44.218Z [DEBUG] [API:timing] first byte after 1111ms
+2026-07-08T06:11:46.097Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:46.098Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:46.098Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:46.102Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:46.102Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:46.109Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_016vvfC5B5SNFJhY6hX7LJkF permissionDecisionMs=5
+2026-07-08T06:11:46.110Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:46.146Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_016vvfC5B5SNFJhY6hX7LJkF outcome=ok durationMs=37
+2026-07-08T06:11:46.176Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:46.176Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:46.176Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:46.179Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:46.179Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:46.199Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:46.209Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:46.209Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:46.209Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:46.209Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:46.210Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:46.211Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:46.212Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:46.212Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:46.213Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:46.213Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:46.213Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:46.213Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:46.214Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:46.216Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:47.403Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:47.403Z [DEBUG] [API:timing] first byte after 1190ms
+2026-07-08T06:11:50.309Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:50.309Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:50.309Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:50.312Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:50.312Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:50.326Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01YUV88pdVxgN7UxAo9EdCUe permissionDecisionMs=12
+2026-07-08T06:11:50.327Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:50.369Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01YUV88pdVxgN7UxAo9EdCUe outcome=ok durationMs=43
+2026-07-08T06:11:50.399Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:50.399Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:50.399Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:50.402Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:50.402Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:50.421Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:52.185Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:52.186Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:52.186Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:52.186Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:52.186Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:52.199Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01LNa7XMRS35RrK8QW1uC5iA permissionDecisionMs=12
+2026-07-08T06:11:52.200Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:52.245Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01LNa7XMRS35RrK8QW1uC5iA outcome=ok durationMs=46
+2026-07-08T06:11:52.273Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:52.274Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:52.274Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:52.277Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:52.277Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:52.298Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:52.307Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:52.307Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:52.307Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:52.307Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:52.309Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:52.310Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:52.310Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:52.311Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:52.311Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:52.311Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:52.312Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:52.312Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:52.312Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:52.314Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:54.112Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:54.112Z [DEBUG] [API:timing] first byte after 1800ms
+2026-07-08T06:11:57.019Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:57.020Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:57.020Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:57.020Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:57.020Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:57.026Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_018RA9XW9bqNBc8dHoVCaj4N permissionDecisionMs=4
+2026-07-08T06:11:57.027Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:11:57.062Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_018RA9XW9bqNBc8dHoVCaj4N outcome=ok durationMs=36
+2026-07-08T06:11:57.093Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:57.093Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:11:57.093Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:11:57.096Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:11:57.097Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:11:57.112Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:11:57.121Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:11:57.121Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:11:57.121Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:11:57.121Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:11:57.123Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:11:57.124Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:11:57.124Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:57.125Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:57.126Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:11:57.126Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:11:57.126Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:11:57.126Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:11:57.126Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:11:57.129Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:11:58.182Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:11:58.182Z [DEBUG] [API:timing] first byte after 1057ms
+2026-07-08T06:12:02.912Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:02.912Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:02.912Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:02.918Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:02.918Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:02.932Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01CYTiEJhqd8uL3hMGnf3Rty permissionDecisionMs=11
+2026-07-08T06:12:02.936Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:02.980Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01CYTiEJhqd8uL3hMGnf3Rty outcome=ok durationMs=48
+2026-07-08T06:12:03.010Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:03.010Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:03.010Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:03.013Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:03.013Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:03.031Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:03.044Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:03.045Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:03.045Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:03.045Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:03.048Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:03.050Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:03.050Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:03.051Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:03.051Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:03.051Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:03.052Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:03.052Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:03.053Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:03.055Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:03.922Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:12:03.922Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.bd083d8bf2ef
+2026-07-08T06:12:03.922Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:12:03.923Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:12:03.924Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.bd083d8bf2ef to /home/yelkhamr/.claude.json
+2026-07-08T06:12:03.924Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:12:04.328Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:04.328Z [DEBUG] [API:timing] first byte after 1276ms
+2026-07-08T06:12:06.418Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:06.419Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:06.419Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:06.422Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:06.422Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:06.439Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01SXUpUxEDXaYNf66a6TsF2B permissionDecisionMs=16
+2026-07-08T06:12:06.441Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:06.492Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01SXUpUxEDXaYNf66a6TsF2B outcome=ok durationMs=53
+2026-07-08T06:12:06.520Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:06.520Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:06.520Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:06.526Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:06.526Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:06.542Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:06.550Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:06.550Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:06.550Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:06.551Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:06.552Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:06.553Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:06.554Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:06.554Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:06.555Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:06.555Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:06.555Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:06.555Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:06.556Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:06.557Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:08.228Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:08.228Z [DEBUG] [API:timing] first byte after 1672ms
+2026-07-08T06:12:09.609Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:09.609Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:09.609Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:09.610Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:09.610Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:09.617Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01BfWffza9gm2313HBNrwMTi permissionDecisionMs=5
+2026-07-08T06:12:09.618Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:09.656Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01BfWffza9gm2313HBNrwMTi outcome=ok durationMs=39
+2026-07-08T06:12:09.685Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:09.685Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:09.685Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:09.686Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:09.686Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:09.708Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:09.716Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:09.716Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:09.716Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:09.716Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:09.718Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:09.719Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:09.719Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:09.720Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:09.720Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:09.720Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:09.721Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:09.721Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:09.721Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:09.724Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:10.761Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:10.761Z [DEBUG] [API:timing] first byte after 1040ms
+2026-07-08T06:12:13.874Z [DEBUG] [skills] idle — switching poll interval to 30000ms
+2026-07-08T06:12:14.099Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.099Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.099Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:14.100Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:14.100Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:14.111Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01MRLx1MTwWYe9fk9hnSMNXN permissionDecisionMs=10
+2026-07-08T06:12:14.113Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:14.151Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01MRLx1MTwWYe9fk9hnSMNXN outcome=ok durationMs=40
+2026-07-08T06:12:14.181Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.181Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.182Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:14.185Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:14.185Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:14.201Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:14.618Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.618Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.618Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:14.619Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:14.619Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:14.625Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_015FFhHwGyivVuM6e7FTJVNL permissionDecisionMs=4
+2026-07-08T06:12:14.632Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:14.662Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_015FFhHwGyivVuM6e7FTJVNL outcome=ok durationMs=37
+2026-07-08T06:12:14.692Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.692Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:14.692Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:14.693Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:14.693Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:14.711Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:14.717Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:14.717Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:14.717Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:14.717Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:14.718Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:14.719Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:14.719Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:14.719Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:14.720Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:14.720Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:14.720Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:14.720Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:14.721Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:14.722Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:16.230Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:16.231Z [DEBUG] [API:timing] first byte after 1510ms
+2026-07-08T06:12:43.504Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:43.504Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:43.504Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:43.505Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:43.506Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:43.526Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_0193gp8PK3ugq8tqTUiDer3G permissionDecisionMs=18
+2026-07-08T06:12:43.532Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:43.745Z [WARN] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_0193gp8PK3ugq8tqTUiDer3G outcome=error durationMs=220
+2026-07-08T06:12:43.745Z [DEBUG] Bash tool error (220ms): Shell command failed
+2026-07-08T06:12:43.753Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:43.753Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:43.753Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:43.753Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:43.756Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:43.758Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:43.759Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:43.759Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:43.760Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:43.760Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:43.760Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:43.761Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:43.761Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:43.763Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:46.050Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:46.050Z [DEBUG] [API:timing] first byte after 2289ms
+2026-07-08T06:12:47.192Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:47.192Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:47.193Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:47.195Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:47.196Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:47.215Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01L7hQax3s7UsBTuWKqbSQ2F permissionDecisionMs=17
+2026-07-08T06:12:47.217Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:12:48.868Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01L7hQax3s7UsBTuWKqbSQ2F outcome=ok durationMs=1654
+2026-07-08T06:12:48.880Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:48.881Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:12:48.881Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:12:48.888Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:12:48.888Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:12:48.917Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:12:48.925Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:12:48.925Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:12:48.926Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:12:48.926Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:12:48.927Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:12:48.929Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:12:48.929Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:48.929Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:48.930Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:12:48.930Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:12:48.930Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:12:48.931Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:12:48.931Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:12:48.933Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:12:50.362Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:12:50.362Z [DEBUG] [API:timing] first byte after 1432ms
+2026-07-08T06:13:06.426Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:13:06.426Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.6156a596b8ee
+2026-07-08T06:13:06.426Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:13:06.427Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:13:06.427Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.6156a596b8ee to /home/yelkhamr/.claude.json
+2026-07-08T06:13:06.427Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:13:18.580Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:13:18.580Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:13:18.580Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:13:18.584Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:13:18.584Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:13:18.592Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01KGRtToawckFKo2UanwXuEJ permissionDecisionMs=7
+2026-07-08T06:13:18.594Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:13:18.629Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01KGRtToawckFKo2UanwXuEJ outcome=ok durationMs=37
+2026-07-08T06:13:18.657Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:13:18.657Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:13:18.657Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:13:18.660Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:13:18.660Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:13:18.678Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:13:18.686Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:13:18.686Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:13:18.686Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:13:18.686Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:13:18.687Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:13:18.688Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:13:18.689Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:13:18.689Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:13:18.690Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:13:18.690Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:13:18.690Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:13:18.690Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:13:18.691Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:13:18.693Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:13:20.238Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:13:20.238Z [DEBUG] [API:timing] first byte after 1548ms
+2026-07-08T06:14:18.589Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:14:18.589Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.b15413c878c3
+2026-07-08T06:14:18.589Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:14:18.590Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:14:18.590Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.b15413c878c3 to /home/yelkhamr/.claude.json
+2026-07-08T06:14:18.590Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:14:18.672Z [WARN] Streaming stall detected: 57.9s gap between events (stall #1)
+2026-07-08T06:14:20.573Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:20.573Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:20.573Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:20.577Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:20.577Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:20.580Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_01DyCgjG2LRrdKaqtGUsYrDg permissionDecisionMs=1
+2026-07-08T06:14:20.584Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_01DyCgjG2LRrdKaqtGUsYrDg outcome=ok durationMs=4
+2026-07-08T06:14:20.615Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:20.615Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:20.615Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:20.618Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:20.619Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:20.635Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:21.508Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:21.508Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:21.508Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:21.514Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:21.514Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:21.515Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_01TvvCNeSbFRWnnja9nJ4TKk permissionDecisionMs=0
+2026-07-08T06:14:21.518Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_01TvvCNeSbFRWnnja9nJ4TKk outcome=ok durationMs=3
+2026-07-08T06:14:21.547Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:21.547Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:21.547Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:21.550Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:21.550Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:21.566Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:22.929Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:22.929Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:22.929Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:22.929Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:22.929Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:22.931Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_013Dp34ze96oVPZ7B6Uk1KuT permissionDecisionMs=0
+2026-07-08T06:14:22.933Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_013Dp34ze96oVPZ7B6Uk1KuT outcome=ok durationMs=1
+2026-07-08T06:14:22.960Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:22.960Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:22.960Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:22.963Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:22.963Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:22.983Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:23.859Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:23.859Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:23.859Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:23.860Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:23.860Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:23.861Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_01J1CFnsF7Ngp1osyu3Edqwn permissionDecisionMs=0
+2026-07-08T06:14:23.864Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_01J1CFnsF7Ngp1osyu3Edqwn outcome=ok durationMs=3
+2026-07-08T06:14:23.893Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:23.893Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:23.893Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:23.896Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:23.896Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:23.914Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:24.813Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:24.813Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:24.813Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:24.814Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:24.814Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:24.815Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_013ESdH5Xd6qZhcZTuU9gor2 permissionDecisionMs=0
+2026-07-08T06:14:24.817Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_013ESdH5Xd6qZhcZTuU9gor2 outcome=ok durationMs=2
+2026-07-08T06:14:24.846Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:24.846Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:24.846Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:24.847Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:24.847Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:24.868Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:25.957Z [WARN] Streaming completed with 1 stall(s), total stall time: 57.9s
+2026-07-08T06:14:25.985Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:25.985Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:25.985Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:25.986Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:25.986Z [DEBUG] "Hook PreToolUse:TaskCreate (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:25.987Z [INFO] [Stall] tool_dispatch_start tool=TaskCreate toolUseId=toolu_vrtx_01F1BB4BTdyrNFcfteYtYP9m permissionDecisionMs=1
+2026-07-08T06:14:25.989Z [INFO] [Stall] tool_dispatch_end tool=TaskCreate toolUseId=toolu_vrtx_01F1BB4BTdyrNFcfteYtYP9m outcome=ok durationMs=2
+2026-07-08T06:14:26.016Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:26.017Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:14:26.017Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:14:26.020Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:14:26.020Z [DEBUG] "Hook PostToolUse:TaskCreate (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:14:26.049Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:14:26.061Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:14:26.061Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:14:26.061Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:14:26.062Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:14:26.074Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:14:26.075Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:14:26.076Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:14:26.076Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:14:26.077Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:14:26.077Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:14:26.078Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:14:26.078Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:14:26.078Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:14:26.080Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:14:27.114Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:14:27.114Z [DEBUG] [API:timing] first byte after 1036ms
+2026-07-08T06:15:20.582Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:15:20.582Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.5f0841eff6ab
+2026-07-08T06:15:20.582Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:15:20.583Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:15:20.583Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.5f0841eff6ab to /home/yelkhamr/.claude.json
+2026-07-08T06:15:20.583Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:15:25.580Z [WARN] Streaming stall detected: 58.0s gap between events (stall #1)
+2026-07-08T06:15:29.077Z [WARN] Streaming completed with 1 stall(s), total stall time: 58.0s
+2026-07-08T06:15:29.106Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:29.106Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:29.106Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:15:29.109Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:15:29.109Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:15:29.128Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01LRt1BYnghTEREReyoZ6bf2 permissionDecisionMs=17
+2026-07-08T06:15:29.130Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:15:29.886Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:15:29.888Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01LRt1BYnghTEREReyoZ6bf2 outcome=ok durationMs=760
+2026-07-08T06:15:29.918Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:29.918Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:29.918Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:15:29.922Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:15:29.922Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:15:29.940Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:15:29.948Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:15:29.948Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:15:29.948Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:15:29.948Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:15:29.950Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:15:29.952Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:15:29.952Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:29.952Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:29.953Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:15:29.953Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:15:29.954Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:15:29.954Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:29.954Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:15:29.957Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:15:30.932Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:15:30.932Z [DEBUG] [API:timing] first byte after 978ms
+2026-07-08T06:15:35.695Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:35.695Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:35.695Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:15:35.697Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:15:35.697Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:15:35.711Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_011vss6dtbMHuXo7psikUTP9 permissionDecisionMs=12
+2026-07-08T06:15:35.720Z [DEBUG] No session environment scripts found
+2026-07-08T06:15:35.721Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:15:36.449Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:15:36.451Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_011vss6dtbMHuXo7psikUTP9 outcome=ok durationMs=740
+2026-07-08T06:15:36.480Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:36.480Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:15:36.480Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:15:36.485Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:15:36.485Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:15:36.507Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:15:36.515Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:15:36.515Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:15:36.515Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:15:36.516Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:15:36.517Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:15:36.519Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:15:36.519Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:36.520Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:36.521Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:15:36.521Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:15:36.521Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:15:36.521Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:15:36.522Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:15:36.524Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:15:37.924Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:15:37.924Z [DEBUG] [API:timing] first byte after 1403ms
+2026-07-08T06:16:29.113Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:16:29.113Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.c11d746fd6de
+2026-07-08T06:16:29.113Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:16:29.114Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:16:29.114Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.c11d746fd6de to /home/yelkhamr/.claude.json
+2026-07-08T06:16:29.114Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:16:44.015Z [WARN] Streaming stall detected: 65.5s gap between events (stall #1)
+2026-07-08T06:16:50.971Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:16:50.972Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:16:50.972Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:16:50.974Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:16:50.975Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:16:50.981Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01Rr6TeAq9ys5mthC8hWmQ8a permissionDecisionMs=4
+2026-07-08T06:16:50.982Z [DEBUG] No session environment scripts found
+2026-07-08T06:16:50.989Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:16:51.278Z [WARN] Streaming completed with 1 stall(s), total stall time: 65.5s
+2026-07-08T06:16:52.033Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:16:52.035Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01Rr6TeAq9ys5mthC8hWmQ8a outcome=ok durationMs=1054
+2026-07-08T06:16:52.063Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:16:52.064Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:16:52.064Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:16:52.069Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:16:52.069Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:16:52.088Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:16:52.097Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:16:52.097Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:16:52.097Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:16:52.097Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:16:52.099Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:16:52.100Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:16:52.101Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:16:52.101Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:16:52.102Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:16:52.102Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:16:52.102Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:16:52.102Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:16:52.103Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:16:52.105Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:16:53.542Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:16:53.542Z [DEBUG] [API:timing] first byte after 1440ms
+2026-07-08T06:17:50.978Z [DEBUG] Preserving file permissions: 100600
+2026-07-08T06:17:50.978Z [DEBUG] Writing to temp file: /home/yelkhamr/.claude.json.tmp.2852621.98efc60a2b01
+2026-07-08T06:17:50.978Z [DEBUG] Applied original permissions to temp file
+2026-07-08T06:17:50.979Z [DEBUG] Temp file written successfully, size: 6690 bytes
+2026-07-08T06:17:50.979Z [DEBUG] Renaming /home/yelkhamr/.claude.json.tmp.2852621.98efc60a2b01 to /home/yelkhamr/.claude.json
+2026-07-08T06:17:50.980Z [DEBUG] File /home/yelkhamr/.claude.json written atomically
+2026-07-08T06:18:43.637Z [WARN] Streaming stall detected: 109.1s gap between events (stall #1)
+2026-07-08T06:18:55.466Z [WARN] Streaming completed with 1 stall(s), total stall time: 109.1s
+2026-07-08T06:18:55.467Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:18:55.467Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:18:55.467Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:18:55.470Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:18:55.470Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:18:55.484Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01LiJRwMrrmuPChZXv6WyDfK permissionDecisionMs=13
+2026-07-08T06:18:55.487Z [DEBUG] No session environment scripts found
+2026-07-08T06:18:55.487Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:18:55.880Z [WARN] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01LiJRwMrrmuPChZXv6WyDfK outcome=error durationMs=396
+2026-07-08T06:18:55.880Z [DEBUG] Bash tool error (396ms): Shell command failed
+2026-07-08T06:18:55.887Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:18:55.887Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:18:55.887Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:18:55.887Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:18:55.890Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:18:55.893Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:18:55.893Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:18:55.893Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:18:55.895Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:18:55.895Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:18:55.895Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:18:55.896Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:18:55.896Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:18:55.899Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:18:56.864Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:18:56.864Z [DEBUG] [API:timing] first byte after 968ms
+2026-07-08T06:19:09.399Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:19:09.399Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:19:09.399Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:19:09.402Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:19:09.402Z [DEBUG] "Hook PreToolUse:Bash (PreToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:19:09.421Z [INFO] [Stall] tool_dispatch_start tool=Bash toolUseId=toolu_vrtx_01WCCYoq83coEuCxewMW7zp7 permissionDecisionMs=18
+2026-07-08T06:19:09.426Z [DEBUG] Spawning shell without login (-l flag skipped)
+2026-07-08T06:19:10.514Z [DEBUG] Invalidating session environment cache
+2026-07-08T06:19:10.516Z [INFO] [Stall] tool_dispatch_end tool=Bash toolUseId=toolu_vrtx_01WCCYoq83coEuCxewMW7zp7 outcome=ok durationMs=1095
+2026-07-08T06:19:10.546Z [DEBUG] Hooks: Checking first line for async: {"systemMessage": "Hookify import error: No module named 'hookify'"}
+2026-07-08T06:19:10.546Z [DEBUG] Hooks: Parsed initial response: {"systemMessage":"Hookify import error: No module named 'hookify'"}
+2026-07-08T06:19:10.546Z [DEBUG] Hooks: Initial response is not async, continuing normal processing
+2026-07-08T06:19:10.550Z [DEBUG] Successfully parsed and validated hook JSON output
+2026-07-08T06:19:10.550Z [DEBUG] "Hook PostToolUse:Bash (PostToolUse) success:\n{\"systemMessage\": \"Hookify import error: No module named 'hookify'\"}\n"
+2026-07-08T06:19:10.568Z [DEBUG] Hook output does not start with {, treating as plain text
+2026-07-08T06:19:10.577Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-07-08T06:19:10.577Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-07-08T06:19:10.577Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-07-08T06:19:10.578Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-07-08T06:19:10.590Z [DEBUG] Tool search disabled: ToolSearchTool is not available (may have been disallowed via disallowedTools).
+2026-07-08T06:19:10.591Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.198.5e9; cc_entrypoint=sdk-py;
+2026-07-08T06:19:10.591Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:19:10.591Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:19:10.592Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: true, has Authorization header: false
+2026-07-08T06:19:10.592Z [DEBUG] [API:auth] OAuth token check starting
+2026-07-08T06:19:10.592Z [DEBUG] [API:auth] OAuth token check complete
+2026-07-08T06:19:10.593Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-07-08T06:19:10.593Z [DEBUG] [API:timing] dispatching to firstParty model=Claude-Opus-4.7
+2026-07-08T06:19:10.595Z [DEBUG] [API REQUEST] /Anthropic/v1/messages source=sdk
+2026-07-08T06:19:11.752Z [DEBUG] Stream started - received first chunk
+2026-07-08T06:19:11.752Z [DEBUG] [API:timing] first byte after 1159ms

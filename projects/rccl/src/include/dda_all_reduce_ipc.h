@@ -12,6 +12,9 @@
 
 struct ncclComm;
 
+/** True when RCCL_DDA_NRANKS_RELAX=1 (allow 2/4/8-rank DDA). Default 0. */
+bool ncclDdaNranksRelaxEnabled();
+
 bool ncclAllReduceDdaIpcEligible(
     ncclComm* comm,
     const void* sendbuff,

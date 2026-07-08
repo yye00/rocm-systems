@@ -1,29 +1,40 @@
 #!/usr/bin/env bash
 # Stall-watcher for RCCL build. Fires when a bob run is wedged (mode-C hang),
-# including the alive-but-FROZEN subagent case (claude process up but cputime
-# not advancing). Multi-signal, won't false-kill a live compile/benchmark.
+# including the alive-but-FROZEN subagent case (claude up, cputime not advancing).
+# GROUND TRUTH for mode-C: log_age>600 (a live streaming agent updates build.log)
+# AND no compiler AND no perf-binary AND BOTH bob-run+subagent cputime frozen.
+# Recent WIP file-writes are NOT a veto: a hung subagent typically writes its last
+# file and THEN freezes, so -mmin writes linger up to 3min after death (this was the
+# bug that let T3 sit wedged 16min). Writes are logged for context, not used to skip.
 cd /home/yelkhamr/dark-factory/rocm-systems
 while true; do
   sleep 60
   P=$(pgrep -f "bob run --all" | head -1); [ -z "$P" ] && continue
   LOG_AGE=$(( $(date +%s) - $(stat -c %Y build.log 2>/dev/null || echo $(date +%s)) ))
-  [ "$LOG_AGE" -lt 600 ] && continue                       # log fresh (<10min): alive
-  # real build/benchmark work = alive
-  [ "$(pgrep -c -f 'amdclang|hipcc|make -j|cmake|clang++' 2>/dev/null)" -gt 0 ] && continue
+  [ "$LOG_AGE" -lt 1200 ] && continue                      # log fresh (<20min): live streaming agent OR long Opus reasoning/deliverable-writing turn (a real mode-C hang stays frozen for many minutes/hours, so 20min still catches it fast while sparing a legit long turn)
+  # real build/benchmark work = genuinely alive (external to the SDK stream)
+  [ "$(pgrep -c -f 'amdclang|hipcc|cc1plus|cmake|ninja|clang\+\+|ld.lld' 2>/dev/null)" -gt 0 ] && continue
+  [ "$(pgrep -x make 2>/dev/null | wc -l)" -gt 0 ] && continue
   [ "$(pgrep -af 'all_reduce_perf|reduce_scatter_perf|all_gather_perf|alltoall_perf' 2>/dev/null | grep -v claude | wc -l)" -gt 0 ] && continue
-  # source/test writes (exclude build-output settling) = alive
-  WR=$(find . -type f -mmin -3 2>/dev/null | grep -vE '/\.git/|build\.log|/\.bob/|/build/|/_deps/|CMakeFiles|stall_watcher|supervisor\.log|/\.remember/|bob\.db' | wc -l)
-  [ "$WR" -gt 0 ] && continue
+  WR=$(find . -type f -mmin -3 2>/dev/null | grep -vE '/\.git/|build\.log|/\.bob/|/build/|/_deps/|CMakeFiles|stall_watcher|supervisor\.log|/\.remember/|bob\.db' | wc -l)  # informational only
+  # ACTIVE COMPILE liveness: RCCL's recursive make spawns SHORT-LIVED amdclang++ (one per
+  # file, <1s each) so a point-in-time compiler pgrep frequently samples 0 mid-build, and
+  # the subagent blocks in ep_poll waiting on make => looks identical to a mode-C hang.
+  # Ground truth for an active compile = fresh build objects. A full librccl build writes
+  # hundreds of .o over 10-20min; post-build artifact settling is a brief one-time flush,
+  # so an .o/.o.d written in the last 2min means the compile is genuinely progressing.
+  # (This nearly caused a false-kill of RCCL T3's first successful compile, 2026-07-08.)
+  OBJ=$(find . -path '*/build/*' \( -name '*.o' -o -name '*.o.d' -o -name '*.so' -o -name '*.a' \) -mmin -2 2>/dev/null | head -1)
+  [ -n "$OBJ" ] && continue
   # cputime advance check on BOTH bob run AND any subagent — frozen BOTH => wedged
   CL=$(pgrep -f 'claude --output-format' | head -1)
   b1=$(ps -o cputime= -p $P 2>/dev/null); c1=$(ps -o cputime= -p $CL 2>/dev/null)
-  sleep 25
+  sleep 90   # was 25s: too short — a long Opus reasoning turn waiting on the gateway shows ~0 cputime for >25s and was FALSE-KILLED (T1a rerolled 4x, 13:24-14:06, each killed mid pre-build/deliverable phase). A REAL mode-C hang is frozen for minutes, so 90s still detects it; this only reduces false-kills.
   b2=$(ps -o cputime= -p $P 2>/dev/null); c2=$(ps -o cputime= -p $CL 2>/dev/null)
-  # convert HH:MM:SS cputime to seconds; near-frozen = delta < 3s (hung agents creep ~1s)
-  _sec(){ awk -F: "{n=NF; s=0; for(i=1;i<=n;i++) s=s*60+\$i; print s}" <<< "${1:-0:0}"; }
+  _sec(){ local t="${1:-0}"; t="${t// /}"; local s=0 p; IFS=: read -ra p <<< "$t"; for x in "${p[@]}"; do s=$((10#${x:-0} + s*60)); done; echo "$s"; }
   bd=$(( $(_sec "$b2") - $(_sec "$b1") )); cd=$(( $(_sec "$c2") - $(_sec "$c1") ))
   if [ "$bd" -lt 3 ] && [ "$cd" -lt 3 ]; then
-    echo "$(date +%T) STALL-WATCHER: killing wedged bob run pid=$P (log_age=${LOG_AGE}s no-compile no-perf no-src-writes bobrun-cputime=$b1 FROZEN subagent-cputime=$c1 FROZEN)"
+    echo "$(date +%T) STALL-WATCHER: killing wedged bob run pid=$P (log_age=${LOG_AGE}s no-compile no-perf recentwrites=$WR[non-veto] bobrun-cputime=$b1 FROZEN subagent-cputime=$c1 FROZEN)"
     kill -9 $P 2>/dev/null; pkill -9 -f claude 2>/dev/null
   fi
 done

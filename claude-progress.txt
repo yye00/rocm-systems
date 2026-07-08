@@ -24,3 +24,57 @@ blockers: Verification failed: Verification checklist:
 
 Failed checks: acceptance_criteria_met
 ---
+timestamp: 2026-07-08 18:14:08 UTC
+feature_id: 9b8fe900-f3e0-4100-bf15-79e3eafc9226
+feature_name: T2 - CPX/XCD/IOD chiplet-hierarchy-aware algo+protocol selection (lossless)
+outcome: failed
+duration_ms: 573986
+num_turns: 61
+cost_usd: 10.732297499999998
+blockers: Verification failed: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/7 criteria: command: cd projects/rccl && ./install.sh (builds on gfx950; gfx942-specific code paths compile-check only) -> command timed out after 600s: 'cd projects/rccl && ./install.sh'; File exists: tuner/rccl_tuner_gfx942.csv (with chiplet-aware rows)
+
+Failed checks: acceptance_criteria_met
+---
+timestamp: 2026-07-08 19:24:13 UTC
+feature_id: 7d6acaa5-3d32-4e54-88f0-8109284befac
+feature_name: T1a - Inline block-quantized two-shot AllReduce (QuickReduce, lossy)
+outcome: failed
+duration_ms: 438805
+num_turns: 23
+cost_usd: 5.89020825
+blockers: Verification failed: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/8 criteria: File exists: src/include/algorithms/all_reduce/quick_reduce_codec.h; File exists: src/dda_quick_reduce_ipc.cu
+
+Failed checks: acceptance_criteria_met
+---
+timestamp: 2026-07-08 19:39:47 UTC
+feature_id: 7d6acaa5-3d32-4e54-88f0-8109284befac
+feature_name: T1a - Inline block-quantized two-shot AllReduce (QuickReduce, lossy)
+outcome: failed
+duration_ms: 141436
+num_turns: 16
+cost_usd: 4.006732499999999
+blockers: Verification failed: Verification checklist:
+  [WARN] source_files_exist: Found 0 source file(s) in workspace
+  [PASS] test_files_exist: Tests not required for this project type
+  [PASS] no_stubs_in_source: Stub detection skipped (non-Python project)
+  [PASS] no_mocks_in_source: Mock detection skipped (non-Python project)
+  [PASS] tests_pass: no Python source files found under src/; pytest run skipped
+  [WARN] code_changes_made: No recently modified files found - feature may already be complete from a prior attempt (acceptance_criteria_met is the authoritative check)
+  [FAIL] acceptance_criteria_met: Failed 2/8 criteria: File exists: src/include/algorithms/all_reduce/quick_reduce_codec.h; File exists: src/dda_quick_reduce_ipc.cu
+
+Failed checks: acceptance_criteria_met
+---

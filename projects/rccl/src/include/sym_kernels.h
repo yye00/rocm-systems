@@ -121,6 +121,9 @@ typedef enum {
   ncclNumSymRegTypes = 4
 } ncclSymRegType_t;
 
+// True when RCCL_SYM_LL128_ENABLE=1 (LL128 symmetric protocol axis). Default 0.
+bool ncclSymLL128Enabled();
+
 // We assume ncclComm contains a field: `ncclSymkState symkState`
 ncclResult_t ncclSymkInitOnce(struct ncclComm* comm);
 ncclResult_t ncclSymkFinalize(struct ncclComm* comm);

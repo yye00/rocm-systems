@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Stall-watcher for RCCL build. Fires when a bob run is wedged (mode-C hang),
+# including the alive-but-FROZEN subagent case (claude up, cputime not advancing).
+# GROUND TRUTH for mode-C: log_age>600 (a live streaming agent updates build.log)
+# AND no compiler AND no perf-binary AND BOTH bob-run+subagent cputime frozen.
+# Recent WIP file-writes are NOT a veto: a hung subagent typically writes its last
+# file and THEN freezes, so -mmin writes linger up to 3min after death (this was the
+# bug that let T3 sit wedged 16min). Writes are logged for context, not used to skip.
+cd /home/yelkhamr/dark-factory/rocm-systems
+while true; do
+  sleep 60
+  P=$(pgrep -f "bob run --all" | head -1); [ -z "$P" ] && continue
+  LOG_AGE=$(( $(date +%s) - $(stat -c %Y build.log 2>/dev/null || echo $(date +%s)) ))
+  [ "$LOG_AGE" -lt 600 ] && continue                       # log fresh (<10min): live streaming agent
+  # real build/benchmark work = genuinely alive (external to the SDK stream)
+  [ "$(pgrep -c -f 'amdclang|hipcc|cc1plus|cmake|ninja|clang\+\+|ld.lld' 2>/dev/null)" -gt 0 ] && continue
+  [ "$(pgrep -x make 2>/dev/null | wc -l)" -gt 0 ] && continue
+  [ "$(pgrep -af 'all_reduce_perf|reduce_scatter_perf|all_gather_perf|alltoall_perf' 2>/dev/null | grep -v claude | wc -l)" -gt 0 ] && continue
+  WR=$(find . -type f -mmin -3 2>/dev/null | grep -vE '/\.git/|build\.log|/\.bob/|/build/|/_deps/|CMakeFiles|stall_watcher|supervisor\.log|/\.remember/|bob\.db' | wc -l)  # informational only
+  # ACTIVE COMPILE liveness: RCCL's recursive make spawns SHORT-LIVED amdclang++ (one per
+  # file, <1s each) so a point-in-time compiler pgrep frequently samples 0 mid-build, and
+  # the subagent blocks in ep_poll waiting on make => looks identical to a mode-C hang.
+  # Ground truth for an active compile = fresh build objects. A full librccl build writes
+  # hundreds of .o over 10-20min; post-build artifact settling is a brief one-time flush,
+  # so an .o/.o.d written in the last 2min means the compile is genuinely progressing.
+  # (This nearly caused a false-kill of RCCL T3's first successful compile, 2026-07-08.)
+  OBJ=$(find . -path '*/build/*' \( -name '*.o' -o -name '*.o.d' -o -name '*.so' -o -name '*.a' \) -mmin -2 2>/dev/null | head -1)
+  [ -n "$OBJ" ] && continue
+  # cputime advance check on BOTH bob run AND any subagent — frozen BOTH => wedged
+  CL=$(pgrep -f 'claude --output-format' | head -1)
+  b1=$(ps -o cputime= -p $P 2>/dev/null); c1=$(ps -o cputime= -p $CL 2>/dev/null)
+  sleep 25
+  b2=$(ps -o cputime= -p $P 2>/dev/null); c2=$(ps -o cputime= -p $CL 2>/dev/null)
+  _sec(){ local t="${1:-0}"; t="${t// /}"; local s=0 p; IFS=: read -ra p <<< "$t"; for x in "${p[@]}"; do s=$((10#${x:-0} + s*60)); done; echo "$s"; }
+  bd=$(( $(_sec "$b2") - $(_sec "$b1") )); cd=$(( $(_sec "$c2") - $(_sec "$c1") ))
+  if [ "$bd" -lt 3 ] && [ "$cd" -lt 3 ]; then
+    echo "$(date +%T) STALL-WATCHER: killing wedged bob run pid=$P (log_age=${LOG_AGE}s no-compile no-perf recentwrites=$WR[non-veto] bobrun-cputime=$b1 FROZEN subagent-cputime=$c1 FROZEN)"
+    kill -9 $P 2>/dev/null; pkill -9 -f claude 2>/dev/null
+  fi
+done

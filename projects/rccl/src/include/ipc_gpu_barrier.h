@@ -128,7 +128,12 @@ class IpcGpuBarrier {
     if constexpr (hasPreviousMemAccess) {
       __syncthreads();
     }
-    if (threadIdx.x < NRANKS) {
+    // nRanks_ (<= NRANKS) is the number of participating ranks. The mailbox
+    // flag stride stays NRANKS (see DeviceMailbox::getFlagIdx) so the buffer
+    // layout is identical for any participant count; only the number of peers
+    // we signal/wait on shrinks. Using NRANKS here would deadlock for
+    // nRanks_ < NRANKS because absent peers never set their flag.
+    if (threadIdx.x < nRanks_) {
       auto peerRank = threadIdx.x;
       if constexpr (fenceType == MemFenceType::ACQUIRE_ONLY) {
         allMailboxes_[peerRank].setFlagNoMemFence(selfRank_, blockIdx.x);
@@ -150,6 +155,7 @@ class IpcGpuBarrier {
  private:
   int nBlocks_{-1};
   int selfRank_{-1};
+  int nRanks_{NRANKS};
   std::array<DeviceMailbox, NRANKS> allMailboxes_;
 
   __host__ IpcGpuBarrier(

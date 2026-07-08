@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "ipc_init_detail.h"
 #include "ipc_mem_handler.h"
+#include "dda_all_reduce_ipc.h"
 
 #include <cuda_runtime.h>
 
@@ -35,7 +36,10 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
     return ncclSuccess;
   }
   // Skip DDA if:
-  // - nRanks is not exactly kDdaNranks (currently hardcoded to 8)
+  // - nRanks is not a supported participant count. By default only exactly
+  //   kDdaNranks (8) is supported; with RCCL_DDA_NRANKS_RELAX=1 the counts
+  //   2/4/8 become eligible (kept <= kDdaNranks so the fixed-size peer table
+  //   and barrier mailbox array below stay in bounds).
   // - multi-node runs
   // - not using 1 process per GPU
   // - MNNVL (fabric-based P2P)
@@ -49,7 +53,11 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
       comm->archName != nullptr &&
       (IsArchMatch(comm->archName, "gfx942") ||
        IsArchMatch(comm->archName, "gfx950"));
-  if (comm->nRanks != kDdaNranks || comm->nNodes != 1 ||
+  const bool nranksSupported =
+      comm->nRanks == kDdaNranks ||
+      (ncclDdaNranksRelaxEnabled() &&
+       (comm->nRanks == 2 || comm->nRanks == 4 || comm->nRanks == 8));
+  if (!nranksSupported || comm->nNodes != 1 ||
       comm->bootstrap == nullptr || comm->directMode || comm->MNNVL ||
       !ddaArchSupported) {
     return ncclSuccess;
@@ -109,6 +117,9 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
     return ncclSuccess;
   }
 
+  // Peer table is sized for kDdaNranks (the max) but only comm->nRanks entries
+  // are populated/copied when RCCL_DDA_NRANKS_RELAX shrinks the participant set.
+  const int nActiveRanks = comm->nRanks;
   void* peerDev = nullptr;
   cudaError_t ce = cudaMalloc(&peerDev, kDdaNranks * sizeof(void*));
   if (ce != cudaSuccess) {
@@ -121,7 +132,7 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
   }
 
   void* h_ptrs[kDdaNranks];
-  for (int i = 0; i < kDdaNranks; ++i) {
+  for (int i = 0; i < nActiveRanks; ++i) {
     void* p = nullptr;
     res = handler->getPeerDeviceMemPtr(i, &p);
     if (res != ncclSuccess) {
@@ -137,7 +148,7 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
   ce = cudaMemcpy(
       peerDev,
       h_ptrs,
-      kDdaNranks * sizeof(void*),
+      nActiveRanks * sizeof(void*),
       cudaMemcpyHostToDevice);
   if (ce != cudaSuccess) {
     CUDACHECKIGNORE(cudaFree(peerDev));
@@ -151,7 +162,7 @@ ncclResult_t ncclDdaIpcCommInit(ncclComm* comm) {
 
   const int nBlocksMax = ddaMaxNBlocksForScratch();
   auto barrierPair = meta::comms::IpcGpuBarrier::mallocAndInit(
-      kDdaNranks, nBlocksMax, comm->rank, comm->bootstrap);
+      nActiveRanks, nBlocksMax, comm->rank, comm->bootstrap);
   if (!barrierPair.first) {
     CUDACHECKIGNORE(cudaFree(peerDev));
     delete handler;

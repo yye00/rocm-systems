@@ -24,6 +24,8 @@
 #include "bootstrap.h"
 #include <mutex>
 #include <float.h>
+#include "alt_rsmi.h"
+#include <set>
 
 #define BUSID_SIZE (sizeof("0000:00:00.0"))
 #define BUSID_REDUCED_SIZE (sizeof("0000:00"))
@@ -2122,4 +2124,65 @@ ncclResult_t ncclCheckMultiRank(struct ncclComm* comm) {
     return ncclInvalidUsage;
   }
   return ncclSuccess;
+}
+
+// Detect SPX vs CPX compute-partition mode from KFD partition ids. On MI300-class
+// GPUs the KFD exposes one topology node per visible device: in SPX there is one
+// node per socket (all reporting partition id 0), while in CPX each XCD is its own
+// node and the partition ids are distinct and non-zero. We therefore classify as
+// CPX when more than one distinct non-zero partition id is present, and as SPX
+// otherwise. The result (and the per-partition fan-out) is cached after the first
+// successful ARSMI read.
+rcclPartitionMode_t rcclTopoDetectPartitionMode(int* localGroup) {
+  static std::mutex detectMutex;
+  static bool cached = false;
+  static rcclPartitionMode_t cachedMode = RCCL_PARTITION_MODE_UNKNOWN;
+  static int cachedLocalGroup = 1;
+
+  std::lock_guard<std::mutex> lock(detectMutex);
+  if (cached) {
+    if (localGroup) *localGroup = cachedLocalGroup;
+    return cachedMode;
+  }
+
+  uint32_t numDevices = 0;
+  if (ARSMI_get_num_devices(&numDevices) != 0 || numDevices == 0) {
+    // ARSMI unavailable (e.g. no sysfs) — leave mode unknown, do not cache so a
+    // later call in a healthier environment can still succeed.
+    if (localGroup) *localGroup = 1;
+    return RCCL_PARTITION_MODE_UNKNOWN;
+  }
+
+  std::set<uint32_t> partitionIds;
+  bool anyNonZero = false;
+  for (uint32_t d = 0; d < numDevices; d++) {
+    uint32_t pid = 0;
+    if (ARSMI_get_partition_id(d, &pid) != 0) continue;
+    partitionIds.insert(pid);
+    if (pid != 0) anyNonZero = true;
+  }
+
+  rcclPartitionMode_t mode;
+  int group;
+  if (anyNonZero && partitionIds.size() > 1) {
+    mode = RCCL_PARTITION_MODE_CPX;
+    // Fan-out = number of partitions sharing the same physical GPU. With uniform
+    // CPX the distinct partition-id count equals the per-GPU XCD count when a
+    // single GPU is present; across multiple GPUs the KFD reuses the same small
+    // id range, so the distinct count is the per-GPU fan-out.
+    group = (int)partitionIds.size();
+  } else {
+    mode = RCCL_PARTITION_MODE_SPX;
+    group = 1;
+  }
+
+  cached = true;
+  cachedMode = mode;
+  cachedLocalGroup = group;
+  if (localGroup) *localGroup = group;
+  INFO(NCCL_INIT|NCCL_GRAPH,
+       "RCCL chiplet detector: partition mode %s (distinct partition ids=%zu, localGroup=%d)",
+       mode == RCCL_PARTITION_MODE_CPX ? "CPX" : "SPX",
+       partitionIds.size(), group);
+  return mode;
 }

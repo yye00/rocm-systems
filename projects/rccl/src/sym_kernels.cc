@@ -147,9 +147,22 @@ NCCL_PARAM(SymCTAs, "SYM_CTAS", 0)
 NCCL_PARAM(SymGinKernelsEnable, "SYM_GIN_KERNELS_ENABLE", 1)
 NCCL_PARAM(SymTmaEnable, "SYM_TMA_ENABLE", 0)
 RCCL_PARAM(SymModel, "SYM_MODEL", 0)
+// Enable the LL128 symmetric protocol (128-byte lossless line, no flag-doubling
+// overhead of plain LL). Default 0: the protocol axis stays LL/Simple only, so
+// selection and tuning are bit- and perf-identical to baseline. LL128 requires
+// 128-byte write ordering that must be verified per-arch on XGMI (gfx942/gfx950)
+// before it can be safely enabled; see perf_results/T3_sym_ll128.md.
+RCCL_PARAM(SymLL128Enable, "SYM_LL128_ENABLE", 0)
+
+bool ncclSymLL128Enabled() {
+  return rcclParamSymLL128Enable() != 0;
+}
 
 enum rcclSymkColl { rcclSymkColl_AllReduce = 0, rcclSymkColl_AllGather = 1, rcclSymkColl_ReduceScatter = 2, rcclSymkColl_Count = 3 };
-enum rcclSymkProto { rcclSymkProto_LL = 0, rcclSymkProto_Simple = 1, rcclSymkProto_Count = 2 };
+// Protocol axis. LL128 is appended after the classic LL/Simple pair so existing
+// [coll][proto] tuning tables keep their indices; entries for LL128 are only
+// consulted when RCCL_SYM_LL128_ENABLE=1.
+enum rcclSymkProto { rcclSymkProto_LL = 0, rcclSymkProto_Simple = 1, rcclSymkProto_LL128 = 2, rcclSymkProto_Count = 3 };
 
 struct rcclSymkTuningModel {
   double baseLat[rcclSymkColl_Count][rcclSymkProto_Count];
@@ -159,49 +172,54 @@ struct rcclSymkTuningModel {
   double withinPeakFactor[rcclSymkColl_Count][rcclSymkProto_Count];
 };
 
+// LL128 columns mirror the LL latency (both are low-latency, flag-carrying
+// protocols) but use the Simple bandwidth term, reflecting LL128's 128-byte
+// lossless line that avoids LL's 2x flag-doubling. They are only consulted when
+// RCCL_SYM_LL128_ENABLE=1 (no kernel maps to rcclSymkProto_LL128 otherwise), so
+// with the gate off these entries do not affect selection.
 static constexpr struct rcclSymkTuningModel rcclSymkTuningModel_0 = {
   .baseLat = {
-             //         LL     Simple
-             /* AR */ { 11.0,  19.5 },
-             /* AG */ { 8.5,   13.0 },
-             /* RS */ { 11.0,  15.0 },
+             //         LL     Simple  LL128
+             /* AR */ { 11.0,  19.5,   11.0 },
+             /* AG */ { 8.5,   13.0,   8.5  },
+             /* RS */ { 11.0,  15.0,   11.0 },
   },
   .smBw = {
-                      { 25.0,   5.0  },
-                      { 22.0,   5.0  },
-                      { 10.0,   20.0 }
+                      { 25.0,   5.0,   15.0 },
+                      { 22.0,   5.0,   14.0 },
+                      { 10.0,   20.0,  15.0 }
   },
   .peakBw =           { 800.0, 1200.0, 1200.0 },
   // The higher, the more conservative the model (less LL usage, more ST usage)
   .llBusFactor =      { 12.0,  4.0,   3.0 },
   // The higher, the more conservative the model (less CTAs)
   .withinPeakFactor = {
-                      { 1.100, 1.005 },
-                      { 1.015, 1.015 },
-                      { 1.025, 1.005 }
+                      { 1.100, 1.005, 1.050 },
+                      { 1.015, 1.015, 1.015 },
+                      { 1.025, 1.005, 1.015 }
   }
 };
 
 static constexpr struct rcclSymkTuningModel rcclSymkTuningModel_1 = {
   .baseLat = {
-             //         LL     Simple
-             /* AR */ { 11.0,  19.5 },
-             /* AG */ { 8.5,   13.0 },
-             /* RS */ { 11.0,  13.0 },
+             //         LL     Simple  LL128
+             /* AR */ { 11.0,  19.5,   11.0 },
+             /* AG */ { 8.5,   13.0,   8.5  },
+             /* RS */ { 11.0,  13.0,   11.0 },
   },
   .smBw = {
-                      { 25.0,   5.0  },
-                      { 22.0,   5.0  },
-                      { 25.0,   20.0 }
+                      { 25.0,   5.0,   15.0 },
+                      { 22.0,   5.0,   14.0 },
+                      { 25.0,   20.0,  22.0 }
   },
   .peakBw =           { 800.0, 1200.0, 1200.0 },
   // The higher, the more conservative the model (less LL usage, more ST usage)
   .llBusFactor =      { 12.0,  4.0,   9.0 },
   // The higher, the more conservative the model (less CTAs)
   .withinPeakFactor = {
-                      { 1.100, 1.005 },
-                      { 1.015, 1.015 },
-                      { 1.025, 1.025 }
+                      { 1.100, 1.005, 1.050 },
+                      { 1.015, 1.015, 1.015 },
+                      { 1.025, 1.025, 1.025 }
   }
 };
 
@@ -522,6 +540,11 @@ ncclResult_t ncclSymkInitOnce(struct ncclComm* comm) {
   struct ncclSymkState* symk = &comm->symkState;
   if (!symk->initialized) {
     symk->initialized = true;
+    if (ncclSymLL128Enabled()) {
+      INFO(NCCL_INIT | NCCL_ENV,
+           "RCCL_SYM_LL128_ENABLE=1: LL128 symmetric protocol axis active "
+           "(requires verified 128B XGMI write ordering; see T3_sym_ll128.md)");
+    }
     struct ncclDevCommRequirements reqs = NCCL_DEV_COMM_REQUIREMENTS_INITIALIZER;
     // Disable LSA multicast for cross-clique since NVLS isn't available across cliques
     symk->hasLsaMultimem = comm->nvlsSupport && ncclTeamLsa(comm).nRanks > 2 && !comm->p2pCrossClique;

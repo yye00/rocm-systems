@@ -332,6 +332,28 @@ int ARSMI_dev_pci_id_get(uint32_t dv_ind, uint64_t *bdfid)
     return 0;
 }
 
+int ARSMI_get_partition_id(uint32_t dv_ind, uint32_t *partition_id)
+{
+    if (partition_id == nullptr) {
+        return EINVAL;
+    }
+
+    if (ARSMI_num_devices < 0) {
+        int res = ARSMI_init();
+        if (res != 0) {
+            return res;
+        }
+    }
+
+    if ((int)dv_ind >= ARSMI_num_devices) {
+        return EINVAL;
+    }
+
+    *partition_id = ARSMI_orderedNodes[dv_ind].s_partition_id;
+
+    return 0;
+}
+
 
 int ARSMI_topo_get_link_info(uint32_t dv_ind_src, uint32_t dv_ind_dst,
                              ARSMI_linkInfo *info)

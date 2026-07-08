@@ -214,6 +214,25 @@ ncclResult_t ncclTopoGetGpuMinPath(struct ncclTopoSystem* system, int type, int*
 ncclResult_t ncclTopoGetGpuMaxPath(struct ncclTopoSystem* system, int type, int* max);
 ncclResult_t ncclTopoSplitNvLink(struct ncclTopoSystem* system, int* splitNvLink);
 
+// Compute-partition mode of MI300-class GPUs, derived from the KFD partition id.
+// SPX exposes the whole GPU as one device (partition id 0 on every rank); CPX
+// exposes each XCD as its own device (distinct, non-zero partition ids). We only
+// distinguish "whole-GPU" (SPX) from "chiplet-split" (CPX) here; DPX/QPX/TPX all
+// present as CPX for tuning purposes because they too split the intra-GPU
+// bandwidth hierarchy.
+typedef enum {
+  RCCL_PARTITION_MODE_UNKNOWN = 0,
+  RCCL_PARTITION_MODE_SPX     = 1,  // single partition (whole GPU)
+  RCCL_PARTITION_MODE_CPX     = 2,  // chiplet-split partitions (per-XCD devices)
+} rcclPartitionMode_t;
+
+// Detect the compute-partition mode of the local GPUs by reading KFD partition
+// ids via ARSMI. Cached after first call; safe to call from any thread. Returns
+// RCCL_PARTITION_MODE_UNKNOWN if ARSMI is unavailable. localGroup, when non-null,
+// is set to the number of ranks that share the local GPU's partition group
+// (i.e. the CPX fan-out, or 1 for SPX / unknown).
+rcclPartitionMode_t rcclTopoDetectPartitionMode(int* localGroup);
+
 struct ncclTopoNetInfo {
   bool coll;
   bool gin;

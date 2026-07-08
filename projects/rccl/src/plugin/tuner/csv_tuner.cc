@@ -37,11 +37,20 @@
 #include "debug.h"
 #include "tuner.h"
 #include "nccl_tuner.h"
+#include "param.h"
+#include "graph/topo.h"
+
+// Gate for the chiplet-hierarchy-aware (CPX/XCD/IOD) tuning path. Default off:
+// when 0, the partitionMode/localGroup CSV fields are ignored entirely and the
+// tuner behaves exactly as before (bit-for-bit identical selection). Set
+// RCCL_CHIPLET_TUNER_ENABLE=1 to have the tuner detect SPX vs CPX partition mode
+// and honor the trailing chiplet-aware fields.
+RCCL_PARAM(ChipletTunerEnable, "CHIPLET_TUNER_ENABLE", 0);
 
 #define RCCL_CSV_TUNER_MAX_LINE_LENGTH 256
 
 // CSV field indices for configuration parsing
-// Format: colltype,minbytes,maxbytes,algorithm,protocol,channels,nNodes,nRanks,numPipeOps,regBuff
+// Format: colltype,minbytes,maxbytes,algorithm,protocol,channels,nNodes,nRanks,numPipeOps,regBuff,partitionMode,localGroup
 #define CONFIG_FIELD_COLLTYPE     0
 #define CONFIG_FIELD_MINBYTES     1
 #define CONFIG_FIELD_MAXBYTES     2
@@ -52,12 +61,16 @@
 #define CONFIG_FIELD_NRANKS       7
 #define CONFIG_FIELD_PIPEOPS      8  // Optional field
 #define CONFIG_FIELD_REGBUFF      9  // Optional field
+#define CONFIG_FIELD_PARTMODE     10 // Optional field (chiplet-aware): any/spx/cpx
+#define CONFIG_FIELD_LOCALGROUP   11 // Optional field (chiplet-aware): CPX fan-out
 
 // Field count constants
 #define CONFIG_FIELDS_REQUIRED    8   // Minimum required fields (up to nRanks)
 #define CONFIG_FIELDS_WITH_PIPEOPS 9  // Fields including numPipeOps
 #define CONFIG_FIELDS_WITH_REGBUFF 10 // Fields including both numPipeOps and regBuff
-#define CONFIG_FIELDS_MAX         10  // Maximum number of fields supported
+#define CONFIG_FIELDS_WITH_PARTMODE 11 // Fields including partitionMode
+#define CONFIG_FIELDS_WITH_LOCALGROUP 12 // Fields including both partitionMode and localGroup
+#define CONFIG_FIELDS_MAX         12  // Maximum number of fields supported
 
 // Global state for CSV config file path discovery
 static std::mutex csvTunerMutex;
@@ -78,6 +91,10 @@ struct CsvTuningConfig {
   int nRanks;
   int numPipeOps;
   int regBuff;
+  // Chiplet-aware match fields. partitionMode: -1 = any, else rcclPartitionMode_t
+  // (SPX/CPX). localGroup: -1 = any, else the required CPX per-GPU fan-out.
+  int partitionMode;
+  int localGroup;
 };
 
 struct CsvTunerContext {
@@ -88,7 +105,23 @@ struct CsvTunerContext {
   size_t nNodes;
   ncclDebugLogger_t logFunction;
   ncclNvlDomainInfo_t nvlDomainInfo;
+  // Populated once at init when RCCL_CHIPLET_TUNER_ENABLE=1; otherwise left at
+  // the "any/off" sentinels so chiplet fields never affect matching.
+  bool chipletEnabled;
+  int detectedPartitionMode;  // rcclPartitionMode_t, or RCCL_PARTITION_MODE_UNKNOWN
+  int detectedLocalGroup;
 };
+
+// Parse the optional partitionMode field. Accepts "any"/"-1", "spx", "cpx"
+// (case-insensitive). Sets *valid=false on an unrecognized token.
+static int parsePartitionMode(const char* str, bool* valid) {
+  *valid = true;
+  if (strcmp(str, "-1") == 0 || strcasecmp(str, "any") == 0) return -1;
+  if (strcasecmp(str, "spx") == 0) return RCCL_PARTITION_MODE_SPX;
+  if (strcasecmp(str, "cpx") == 0) return RCCL_PARTITION_MODE_CPX;
+  *valid = false;
+  return -1;
+}
 
 // Parse collective type from string; sets *valid=false and returns a placeholder if unknown
 static ncclFunc_t parseCollType(const char* str, bool* valid) {
@@ -333,6 +366,29 @@ static ncclResult_t loadConfig(CsvTunerContext* ctx, const char* filename) {
         config->regBuff = -1; // -1 means match any regBuff value
       }
 
+      // partitionMode is optional (11th field, index 10) — chiplet-aware
+      if (tokenCount >= CONFIG_FIELDS_WITH_PARTMODE) {
+        bool partModeValid;
+        config->partitionMode = parsePartitionMode(tokens[CONFIG_FIELD_PARTMODE], &partModeValid);
+        if (!partModeValid) {
+          if (ctx->logFunction) {
+            ctx->logFunction(NCCL_LOG_WARN, NCCL_TUNING, __FILE__, __LINE__,
+                             "TUNER/CsvTuner: Skipping line %d with unknown partitionMode value: %s",
+                             lineNum, line);
+          }
+          continue;
+        }
+      } else {
+        config->partitionMode = -1; // -1 means match any partition mode
+      }
+
+      // localGroup is optional (12th field, index 11) — chiplet-aware
+      if (tokenCount >= CONFIG_FIELDS_WITH_LOCALGROUP) {
+        config->localGroup = atoi(tokens[CONFIG_FIELD_LOCALGROUP]);
+      } else {
+        config->localGroup = -1; // -1 means match any local group size
+      }
+
       ctx->numConfigs++;
 
       if (ctx->logFunction) {
@@ -522,6 +578,17 @@ static ncclResult_t csvTunerInit(void** context, uint64_t commId, size_t nRanks,
   ctx->nRanks = nRanks;
   ctx->nNodes = nNodes;
   ctx->logFunction = logFunction;
+  ctx->chipletEnabled = (rcclParamChipletTunerEnable() != 0);
+  ctx->detectedPartitionMode = RCCL_PARTITION_MODE_UNKNOWN;
+  ctx->detectedLocalGroup = 1;
+  if (ctx->chipletEnabled) {
+    ctx->detectedPartitionMode = (int)rcclTopoDetectPartitionMode(&ctx->detectedLocalGroup);
+    if (logFunction) {
+      logFunction(NCCL_LOG_INFO, NCCL_TUNING, __FILE__, __LINE__,
+                  "TUNER/CsvTuner: chiplet tuner enabled; detected partitionMode=%d localGroup=%d",
+                  ctx->detectedPartitionMode, ctx->detectedLocalGroup);
+    }
+  }
   if (nvlDomainInfo) {
     ctx->nvlDomainInfo = *nvlDomainInfo;
   } else {
@@ -587,6 +654,19 @@ static ncclResult_t csvTunerGetCollInfo(void* context, ncclFunc_t collType, size
   for (int i = 0; i < ctx->numConfigs; i++) {
     CsvTuningConfig* config = &ctx->configs[i];
 
+    // Chiplet-aware match terms. When RCCL_CHIPLET_TUNER_ENABLE=0 these are
+    // forced true so partitionMode/localGroup are ignored and selection is
+    // bit-for-bit identical to the legacy tuner. When enabled, a row that
+    // specifies a chiplet field must match the detected partition mode / fan-out.
+    bool partitionMatch = true;
+    bool localGroupMatch = true;
+    if (ctx->chipletEnabled) {
+      partitionMatch = (config->partitionMode == -1 ||
+                        config->partitionMode == ctx->detectedPartitionMode);
+      localGroupMatch = (config->localGroup == -1 ||
+                         config->localGroup == ctx->detectedLocalGroup);
+    }
+
     // Check if this config matches the current collective, size range, topology, pipeline ops, and regBuff
     if (config->collType == collType &&
         nBytes >= config->minBytes &&
@@ -594,7 +674,8 @@ static ncclResult_t csvTunerGetCollInfo(void* context, ncclFunc_t collType, size
         (config->nNodes == -1 || config->nNodes == (int)ctx->nNodes) &&
         (config->nRanks == -1 || config->nRanks == (int)ctx->nRanks) &&
         (config->numPipeOps == -1 || config->numPipeOps == numPipeOps) &&
-        (config->regBuff == -1 || config->regBuff == regBuff)) {
+        (config->regBuff == -1 || config->regBuff == regBuff) &&
+        partitionMatch && localGroupMatch) {
 
       // Check bounds
       if (config->algorithm < numAlgo && config->protocol < numProto) {

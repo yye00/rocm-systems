@@ -1,0 +1,7 @@
+q4     mean_rel_err = 1.89982e-01
+q6     mean_rel_err = 4.28033e-02
+q8     mean_rel_err = 1.04489e-02
+fp8    mean_rel_err = 3.59303e-02
+fp4    mean_rel_err = 1.64419e-01
+
+AC check (<=2e-2 for Q4 and FP4): Q4 FAIL, FP4 FAIL

@@ -5,7 +5,13 @@ cd /home/yelkhamr/dark-factory/rocm-systems
 source ~/dark-factory/bob/bob_build.env
 export BOB_REGRESSION_DETECTION_ENABLED=0
 export BOB_SUB_AGENT_MAX_TURNS=100
-export BOB_MAX_CONCURRENT_FEATURES=32
+export BOB_MAX_CONCURRENT_FEATURES=1
+# RCCL install.sh does a CLEAN full build (rm -rf build/release, ~18k objects); even
+# scoped to --amdgpu_targets gfx950 it legitimately exceeds the 600s command:-AC
+# default. BOB_CRITERION_EXEC_TIMEOUT is the sanctioned operator budget knob (a TIME
+# budget, NOT a correctness gate) — raised so a real build is not false-failed.
+# Does NOT touch #wrong==0 or busbw +/-2% anti-cheat gates.
+export BOB_CRITERION_EXEC_TIMEOUT=2400
 unset BOB_CI_MODE
 PY=~/dark-factory/bob97/.venv/bin/python
 BOB=~/dark-factory/bob97/.venv/bin/bob
@@ -39,7 +45,7 @@ for f,dp in deps: dd[f].append(dp)
 print(sum(1 for i,s in rows if s in ('pending','ready') and all(st.get(x)=='completed' for x in dd.get(i,[]))))")
   echo "[supervisor] iter=$i completed=$completed runnable=$RUN $(date +%T)"
   if [ "$RUN" = "0" ]; then echo "[supervisor] STOP: no runnable pending"; break; fi
-  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+  $BOB run --all --max-concurrent-features 1 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
   echo "[supervisor] bob exited=$? completed_after=$($PY -c "import sqlite3;print(sqlite3.connect('bob.db').cursor().execute('SELECT COUNT(*) FROM features WHERE status=\"completed\"').fetchone()[0])") $(date +%T)"
   sleep 5
 done

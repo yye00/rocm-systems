@@ -13,6 +13,7 @@
 #include "debug.h"
 #include "ipc_gpu_barrier.h"
 #include "ipc_init_detail.h"
+#include "param.h"
 
 #include <cuda_runtime.h>
 
@@ -20,6 +21,17 @@
 #include <cstdlib>
 #include <memory>
 #include <new>
+
+// Relax the DDA/symmetric AllReduce eligibility beyond exactly 8 ranks. When 0
+// (default) the classic 8-rank-only gate is enforced and behaviour is bit- and
+// perf-identical to baseline. When 1, comms of 2/4/8 ranks are eligible. Only
+// power-of-two participant counts <= kDdaNranks are supported because the DDA
+// kernels are template-instantiated per participant count.
+RCCL_PARAM(DdaNranksRelax, "DDA_NRANKS_RELAX", 0);
+
+bool ncclDdaNranksRelaxEnabled() {
+  return rcclParamDdaNranksRelax() != 0;
+}
 
 namespace {
 
@@ -29,6 +41,82 @@ using nccl_dda_ipc_detail::kDdaNranks;
 
 /** Flat below this size; tree above (see ddaAllReduceFlatIpc / ddaAllReduceTreeIpc). */
 constexpr size_t kDdaFlatTreeThresholdBytes = 1ULL << 18;
+
+/** True when nRanks is a supported DDA participant count. */
+static bool ddaNranksSupported(int nRanks) {
+  if (nRanks == kDdaNranks) {
+    return true;
+  }
+  if (!ncclDdaNranksRelaxEnabled()) {
+    return false;
+  }
+  return nRanks == 2 || nRanks == 4 || nRanks == 8;
+}
+
+template <typename T, int NRANKS>
+static ncclResult_t ncclAllReduceDdaIpcLaunch(
+    const void* sendbuff,
+    void* recvbuff,
+    size_t count,
+    ncclComm* comm,
+    cudaStream_t stream) {
+  const size_t sizeBytes = count * sizeof(T);
+  const bool wantTree = sizeBytes > kDdaFlatTreeThresholdBytes;
+  const bool treeOk =
+      wantTree && (count % static_cast<size_t>(NRANKS) == 0);
+
+  if (wantTree && !treeOk) {
+    INFO(
+        NCCL_ALL,
+        "DDA IPC: size %zu B > 256KB but count %zu not divisible by %d; using flat kernel",
+        sizeBytes,
+        count,
+        NRANKS);
+  }
+
+  const int nBlocksMax = ddaMaxNBlocksForScratch();
+  auto gridBlock = meta::comms::getGridAndBlockDims(count, sizeof(T), nBlocksMax);
+  const auto& grid = gridBlock.first;
+  const auto& block = gridBlock.second;
+
+  auto* barrierState =
+      static_cast<DdaIpcBarrierState*>(comm->ddaIpcBarrierState);
+  meta::comms::IpcGpuBarrier barrierHost = barrierState->barrierHost;
+
+  void* peerPtrsDev = comm->ddaIpcPeerPtrsDev;
+  T** d_ipcbuffs = reinterpret_cast<T**>(peerPtrsDev);
+
+  if (treeOk) {
+    CUDACHECK(cudaMemcpyAsync(
+        comm->ddaIpcScratch,
+        sendbuff,
+        count * sizeof(T),
+        cudaMemcpyDeviceToDevice,
+        stream));
+    meta::comms::ddaAllReduceTreeIpc<T, NRANKS, false>
+        <<<grid, block, 0, stream>>>(
+            d_ipcbuffs,
+            static_cast<T*>(recvbuff),
+            count,
+            static_cast<const T*>(sendbuff),
+            comm->rank,
+            barrierHost,
+            nullptr);
+  } else {
+    meta::comms::ddaAllReduceFlatIpc<T, NRANKS, false>
+        <<<grid, block, 0, stream>>>(
+            d_ipcbuffs,
+            static_cast<T*>(recvbuff),
+            count,
+            static_cast<const T*>(sendbuff),
+            comm->rank,
+            barrierHost,
+            nullptr);
+  }
+
+  CUDACHECK(cudaGetLastError());
+  return ncclSuccess;
+}
 
 template <typename T>
 static ncclResult_t ncclAllReduceDdaIpcTyped(
@@ -50,65 +138,23 @@ static ncclResult_t ncclAllReduceDdaIpcTyped(
     return ncclInvalidArgument;
   }
 
-  const size_t sizeBytes = count * sizeof(T);
-  const unsigned threads = 512;
-  const bool wantTree = sizeBytes > kDdaFlatTreeThresholdBytes;
-  const bool treeOk =
-      wantTree && (count % static_cast<size_t>(kDdaNranks) == 0);
-
-  if (wantTree && !treeOk) {
-    INFO(
-        NCCL_ALL,
-        "DDA IPC: size %zu B > 256KB but count %zu not divisible by %d; using flat kernel",
-        sizeBytes,
-        count,
-        kDdaNranks);
+  // Dispatch to the template instantiation for the active participant count.
+  // Only power-of-two counts <= kDdaNranks are instantiated; ncclAllReduceDdaIpcEligible
+  // guarantees comm->nRanks is one of these before we get here.
+  switch (comm->nRanks) {
+  case 8:
+    return ncclAllReduceDdaIpcLaunch<T, 8>(
+        sendbuff, recvbuff, count, comm, stream);
+  case 4:
+    return ncclAllReduceDdaIpcLaunch<T, 4>(
+        sendbuff, recvbuff, count, comm, stream);
+  case 2:
+    return ncclAllReduceDdaIpcLaunch<T, 2>(
+        sendbuff, recvbuff, count, comm, stream);
+  default:
+    WARN("DDA IPC allreduce: unsupported nRanks %d", comm->nRanks);
+    return ncclInvalidUsage;
   }
-
- 
-  const int nBlocksMax = ddaMaxNBlocksForScratch(); 
-  auto gridBlock = meta::comms::getGridAndBlockDims(count, sizeof(T), nBlocksMax);
-  const auto& grid = gridBlock.first;
-  const auto& block = gridBlock.second;
-
-  auto* barrierState =
-      static_cast<DdaIpcBarrierState*>(comm->ddaIpcBarrierState);
-  meta::comms::IpcGpuBarrier barrierHost = barrierState->barrierHost;
-
-  void* peerPtrsDev = comm->ddaIpcPeerPtrsDev;
-  T** d_ipcbuffs = reinterpret_cast<T**>(peerPtrsDev);
-
-  if (treeOk) {
-    CUDACHECK(cudaMemcpyAsync(
-        comm->ddaIpcScratch,
-        sendbuff,
-        count * sizeof(T),
-        cudaMemcpyDeviceToDevice,
-        stream));
-    meta::comms::ddaAllReduceTreeIpc<T, kDdaNranks, false>
-        <<<grid, block, 0, stream>>>(
-            d_ipcbuffs,
-            static_cast<T*>(recvbuff),
-            count,
-            static_cast<const T*>(sendbuff),
-            comm->rank,
-            barrierHost,
-            nullptr);
-  } else {
-    meta::comms::ddaAllReduceFlatIpc<T, kDdaNranks, false>
-        <<<grid, block, 0, stream>>>(
-            d_ipcbuffs,
-            static_cast<T*>(recvbuff),
-            count,
-            static_cast<const T*>(sendbuff),
-            comm->rank,
-            barrierHost,
-            nullptr);
-  }
-
-  CUDACHECK(cudaGetLastError());
-
-  return ncclSuccess;
 }
 
 } // namespace
@@ -133,7 +179,7 @@ bool ncclAllReduceDdaIpcEligible(
   if (comm->nNodes != 1) {
     return false;
   }
-  if (comm->nRanks != nccl_dda_ipc_detail::kDdaNranks) {
+  if (!ddaNranksSupported(comm->nRanks)) {
     return false;
   }
   if (op != ncclSum) {

@@ -2574,7 +2574,14 @@ static ncclResult_t ncclCommInitRankFunc(struct ncclAsyncJob* job_) {
   }
 
   NCCLCHECKGOTO(latency_profiler::collTraceInit(comm), res, fail);
-  if (!job->parent && !job->isGrow && comm->nNodes == 1 && comm->nRanks == 8) {
+  // DDA IPC needs a single-node clique. The default participant count is exactly
+  // 8; with RCCL_DDA_NRANKS_RELAX=1 the 2/4-rank cliques also qualify. The inner
+  // ncclDdaIpcCommInit re-checks the exact count, so this gate only has to admit
+  // the candidates cheaply (skip the alloc for the common non-DDA case).
+  if (!job->parent && !job->isGrow && comm->nNodes == 1 &&
+      (comm->nRanks == 8 ||
+       (ncclDdaNranksRelaxEnabled() &&
+        (comm->nRanks == 2 || comm->nRanks == 4)))) {
   	NCCLCHECKGOTO(ncclDdaIpcCommInit(comm), res, fail);
   }
   // update communicator state

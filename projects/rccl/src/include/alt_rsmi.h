@@ -56,6 +56,10 @@ typedef struct ARSMI_linkInfo ARSMI_linkInfo;
 int ARSMI_init (void);
 int ARSMI_get_num_devices (uint32_t *num_devices);
 int ARSMI_dev_pci_id_get(uint32_t dv_ind, uint64_t *bdfid);
+/* Read the compute-partition id (bits 28-31 of the BDF/location id) for device
+ * dv_ind. On MI300-class GPUs this identifies the CPX/DPX/TPX sub-partition;
+ * it is 0 for SPX (whole-GPU) mode. Returns 0 on success, EINVAL on bad args. */
+int ARSMI_get_partition_id(uint32_t dv_ind, uint32_t *partition_id);
 int ARSMI_topo_get_link_info(uint32_t dv_ind_src, uint32_t dv_ind_dst,
                              ARSMI_linkInfo *info);
 
