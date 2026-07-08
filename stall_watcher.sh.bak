@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Background stall-watcher for the bob97 build. Auto-SIGKILLs a mode-C
+# silently-hung `bob run` so the supervisor relaunches. Conservative: fires ONLY
+# when ALL of: executing set stale >12min AND no src/tests writes in 4min AND
+# zero claude subagents AND bob run cputime unchanged across 20s. Never touches
+# the DB (the supervisor resets executing->pending). WIP preserved (per-feature
+# commits + disk reconciler).
+cd /home/yelkhamr/dark-factory/rocm-systems
+PY=~/dark-factory/bob97/.venv/bin/python
+while true; do
+  sleep 60
+  P=$(pgrep -f "bob run --all" | head -1)
+  [ -z "$P" ] && continue
+  # executing staleness (seconds since max updated_at)
+  AGE=$($PY - <<'PYEOF'
+import sqlite3, datetime
+try:
+    c=sqlite3.connect("bob.db")
+    m=c.execute("select max(updated_at) from features where status='executing'").fetchone()[0]
+    if not m: print(0); raise SystemExit
+    t=datetime.datetime.fromisoformat(m)
+    print(int((datetime.datetime.now()-t).total_seconds()))
+except Exception:
+    print(0)
+PYEOF
+)
+  [ "$AGE" -lt 360 ] && continue                      # <12min executing-stale: not stalled
+  WRITES=$(find src tests -type f -mmin -4 2>/dev/null | wc -l)
+  [ "$WRITES" -gt 0 ] && continue                     # recent writes: alive
+  CL=$(pgrep -f claude | wc -l)
+  [ "$CL" -gt 0 ] && continue                         # subagents alive
+  t1=$(ps -o cputime= -p $P 2>/dev/null); sleep 20; t2=$(ps -o cputime= -p $P 2>/dev/null)
+  [ "$t1" != "$t2" ] && continue                      # cputime advancing: alive
+  echo "$(date +%T) STALL-WATCHER: killing wedged bob run pid=$P (exec_stale=${AGE}s writes4m=0 claude=0 cputime frozen)"
+  kill -9 $P 2>/dev/null
+  pkill -9 -f claude 2>/dev/null
+done

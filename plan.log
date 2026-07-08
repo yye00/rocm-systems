@@ -1,0 +1,298 @@
+[2026-07-07 20:50:38] [INFO] [cli] Loading spec file: rccl_single_node_opt.yaml
+Spec file: rccl_single_node_opt.yaml
+    Plan: rccl-single-node-opt     
+┌──────────┬──────────────────────┐
+│ Name     │ rccl-single-node-opt │
+│ Version  │ 0.1.0                │
+│ Features │ 9                    │
+└──────────┴──────────────────────┘
+                                    Features                                    
+┏━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃    # ┃ Name                              ┃ Description                       ┃
+┡━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ F000 │ Hydrate workspace via fresh full  │ Populate the workspace with a     │
+│      │ upstream clone of rocm-systems    │ FRESH FULL clone of the upstream  │
+│      │                                   │ monorepo                          │
+│      │                                   │ (git clone                        │
+│      │                                   │ https://github.com/ROCm/rocm-sys… │
+│      │                                   │ so projects/rccl and              │
+│      │                                   │ projects/rccl-tests and their     │
+│      │                                   │ full git history are present      │
+│      │                                   │ before any build.                 │
+│      │                                   │ Use a full clone (NOT --depth 1): │
+│      │                                   │ brownfield localization, git      │
+│      │                                   │ blame, and                        │
+│      │                                   │ cross-commit reasoning need the   │
+│      │                                   │ history. If a rocm-systems        │
+│      │                                   │ checkout already                  │
+│      │                                   │ exists in the workspace, verify   │
+│      │                                   │ it is a non-shallow clone of the  │
+│      │                                   │ correct                           │
+│      │                                   │ upstream remote (git rev-parse    │
+│      │                                   │ --is-shallow-repository == false  │
+│      │                                   │ and the origin                    │
+│      │                                   │ URL is ROCm/rocm-systems); if it  │
+│      │                                   │ is shallow, wrong-remote, or      │
+│      │                                   │ missing, (re)clone                │
+│      │                                   │ it. This is the hydration step    │
+│      │                                   │ every other feature depends on.   │
+│      │                                   │                                   │
+│      │                                   │ Permanent-forward-carry note      │
+│      │                                   │ (application spec): the builder's │
+│      │                                   │ infra-recovery                    │
+│      │                                   │ guarantees F-R7-478 (infra-error  │
+│      │                                   │ transient classifier), F-R7-479   │
+│      │                                   │ (RCA auto-reset                   │
+│      │                                   │ fresh-attempt budget), and        │
+│      │                                   │ F-R7-553 (slopsquatting           │
+│      │                                   │ first-party allowlist) are        │
+│      │                                   │ provided by the bob builder       │
+│      │                                   │ toolchain itself and are          │
+│      │                                   │ inherited/satisfied for this      │
+│      │                                   │ application build; they are not   │
+│      │                                   │ re-implemented here (this is an   │
+│      │                                   │ RCCL application                  │
+│      │                                   │ spec, not a bob self-generation   │
+│      │                                   │ spec).                            │
+│      │                                   │                                   │
+│ F001 │ Baseline build + rccl-tests       │ Establish the pre-change          │
+│      │ BEFORE capture                    │ baseline. Build RCCL and          │
+│      │                                   │ rccl-tests unmodified, confirm    │
+│      │                                   │ the 8-GPU XGMI clique via         │
+│      │                                   │ tools/topo_expl, and capture the  │
+│      │                                   │ rccl-tests performance            │
+│      │                                   │ sweep that later targets are      │
+│      │                                   │ measured against. Record ROCm     │
+│      │                                   │ version and GPU arch              │
+│      │                                   │ (gfx942 vs gfx950). Save raw      │
+│      │                                   │ outputs (with correctness         │
+│      │                                   │ checking on, -c 1) to             │
+│      │                                   │ projects/rccl/perf_results/basel… │
+│      │                                   │ for AllReduce (fp16 + bf16),      │
+│      │                                   │ ReduceScatter,                    │
+│      │                                   │ AllGather, and AllToAll across    │
+│      │                                   │ the full size range so each       │
+│      │                                   │ target has a matching             │
+│      │                                   │ baseline. This is the "BEFORE"    │
+│      │                                   │ half of the before/after impact   │
+│      │                                   │ measurement.                      │
+│      │                                   │                                   │
+│ F002 │ A/B benchmark harness             │ Provide a reusable script         │
+│      │ (before/after delta)              │ projects/rccl/perf_results/ab_be… │
+│      │                                   │ that runs a named                 │
+│      │                                   │ rccl-tests sweep (collective,     │
+│      │                                   │ size range, dtype, ngpus, env     │
+│      │                                   │ vars) and a parser that           │
+│      │                                   │ extracts per-size busbw / algbw / │
+│      │                                   │ latency / #wrong from rccl-tests  │
+│      │                                   │ stdout, then emits                │
+│      │                                   │ a markdown before/after table     │
+│      │                                   │ given a baseline file and an      │
+│      │                                   │ after file (computing             │
+│      │                                   │ per-size busbw uplift %, the      │
+│      │                                   │ crossover size where gate-ON      │
+│      │                                   │ first beats baseline, the         │
+│      │                                   │ max gate-OFF regression, and a    │
+│      │                                   │ PASS/FAIL verdict). For lossy     │
+│      │                                   │ targets the harness also          │
+│      │                                   │ accepts a measured                │
+│      │                                   │ mean-relative-error column in     │
+│      │                                   │ place of the #wrong gate. This    │
+│      │                                   │ harness is what every target      │
+│      │                                   │ feature uses to produce its       │
+│      │                                   │ "AFTER" evidence.                 │
+│      │                                   │                                   │
+│ F003 │ T2 - CPX/XCD/IOD                  │ Recommended lead (lossless, tuner │
+│      │ chiplet-hierarchy-aware           │ scaffold already exists). Detect  │
+│      │ algo+protocol selection           │ SPX vs CPX                        │
+│      │ (lossless)                        │ partition mode and XCD/IOD        │
+│      │                                   │ grouping and pick algo+protocol   │
+│      │                                   │ per message-size zone             │
+│      │                                   │ (small -> Tree+LL, mid ->         │
+│      │                                   │ Tree+LL128, large ->              │
+│      │                                   │ Ring+Simple), exploiting the      │
+│      │                                   │ MI300X                            │
+│      │                                   │ intra-GPU bandwidth hierarchy     │
+│      │                                   │ (within-XCD >> XCD->IOD >>        │
+│      │                                   │ IOD->HBM). Add a partition/       │
+│      │                                   │ XCD detector in src/graph/topo.*  │
+│      │                                   │ consuming s_partition_id already  │
+│      │                                   │ parsed at                         │
+│      │                                   │ src/misc/alt_rsmi.cc:133,151;     │
+│      │                                   │ extend the CSV tuner schema at    │
+│      │                                   │ src/plugin/tuner/csv_tuner.cc:44  │
+│      │                                   │ with optional trailing fields     │
+│      │                                   │ (partitionMode,                   │
+│      │                                   │ localGroup) in a                  │
+│      │                                   │ backward-compatible way and add   │
+│      │                                   │ them to the match loop            │
+│      │                                   │ (:587-602);                       │
+│      │                                   │ ship tuner/rccl_tuner_gfx942.csv  │
+│      │                                   │ and add CPX (nRanks=64) rows to   │
+│      │                                   │ tuner/rccl_tuner_gfx950.csv.      │
+│      │                                   │ Optionally add an IOD-distance    │
+│      │                                   │ hop penalty to the cost           │
+│      │                                   │ model at                          │
+│      │                                   │ src/graph/tuning.cc:1148. Gate:   │
+│      │                                   │ RCCL_CHIPLET_TUNER_ENABLE         │
+│      │                                   │ (default 0).                      │
+│      │                                   │                                   │
+│ F004 │ T3 - Generalize DDA/symmetric AR  │ Widen an existing portable path.  │
+│      │ beyond 8-rank/ncclSum + add       │ Add LL128 to the symmetric        │
+│      │ symmetric LL128 (lossless)        │ protocol axis                     │
+│      │                                   │ (rcclSymkProto is currently       │
+│      │                                   │ _LL/_Simple only at               │
+│      │                                   │ src/sym_kernels.cc:152) via       │
+│      │                                   │ src/device/symmetric/generate.py  │
+│      │                                   │ + kernel.cuh with matching tuning │
+│      │                                   │ entries; and                      │
+│      │                                   │ relax the DDA/symmetric AllReduce │
+│      │                                   │ eligibility beyond exactly 8      │
+│      │                                   │ ranks                             │
+│      │                                   │ (kDdaNranks at                    │
+│      │                                   │ src/dda_all_reduce_ipc.cu:136) to │
+│      │                                   │ 2/4/8, plus relax the             │
+│      │                                   │ ncclSum-only                      │
+│      │                                   │ gate for associative ops on the   │
+│      │                                   │ LD/ST one-shot path (generalize   │
+│      │                                   │ CollCommon.h vecElementAdd). Keep │
+│      │                                   │ MC/TMA paths excluded             │
+│      │                                   │ (NVIDIA-only,                     │
+│      │                                   │ src/device/symmetric/generate.py… │
+│      │                                   │ Verify 128B atomic writes on XGMI │
+│      │                                   │ for                               │
+│      │                                   │ gfx942/gfx950 before enabling     │
+│      │                                   │ LL128. Gates:                     │
+│      │                                   │ RCCL_SYM_LL128_ENABLE,            │
+│      │                                   │ RCCL_DDA_NRANKS_RELAX (default    │
+│      │                                   │ 0).                               │
+│      │                                   │                                   │
+│ F005 │ T1a - Inline block-quantized      │ Highest peak speedup but LOSSY -  │
+│      │ two-shot AllReduce (QuickReduce,  │ off by default and never selected │
+│      │ lossy)                            │ on the exact                      │
+│      │                                   │ ncclSum path. Two-shot RS ->      │
+│      │                                   │ reduce -> AG where every XGMI     │
+│      │                                   │ transfer carries block-32         │
+│      │                                   │ quantized data with a per-block   │
+│      │                                   │ FP16 scale. Codecs Q4/Q6/Q8/FP8   │
+│      │                                   │ on gfx942; native                 │
+│      │                                   │ FP4 on gfx950 via                 │
+│      │                                   │ __builtin_amdgcn_cvt_scalef32_pk… │
+│      │                                   │ (gfx950-only; #if-guard,          │
+│      │                                   │ gfx942 falls back to INT codecs). │
+│      │                                   │ New codec header                  │
+│      │                                   │ src/include/algorithms/all_reduc… │
+│      │                                   │ new kernel                        │
+│      │                                   │ src/dda_quick_reduce_ipc.cu +     │
+│      │                                   │ .../all_reduce/quick_reduce_dda.h │
+│      │                                   │ modeled on                        │
+│      │                                   │ ddaAllReduceTreeIpc               │
+│      │                                   │ (src/include/algorithms/all_redu… │
+│      │                                   │ reusing                           │
+│      │                                   │ src/include/ipc_gpu_barrier.h and │
+│      │                                   │ CollCommon.h; co-locate the FP4   │
+│      │                                   │ builtin with the                  │
+│      │                                   │ FP8 builtins in                   │
+│      │                                   │ src/include/rccl_float8.h;        │
+│      │                                   │ dispatch in src/collectives.cc    │
+│      │                                   │ near the                          │
+│      │                                   │ DDA call (:440-442), relaxing the │
+│      │                                   │ exactly-8-rank gate to 2/4/8;     │
+│      │                                   │ scale effective                   │
+│      │                                   │ nBytes by the compression ratio   │
+│      │                                   │ in the cost model                 │
+│      │                                   │ (src/graph/tuning.cc:1148) so the │
+│      │                                   │ selector prefers it above the     │
+│      │                                   │ crossover. Gates:                 │
+│      │                                   │ RCCL_QUICKREDUCE_ENABLE (default  │
+│      │                                   │ 0),                               │
+│      │                                   │ RCCL_QUICKREDUCE_CODEC            │
+│      │                                   │ (q4/q6/q8/fp8/fp4),               │
+│      │                                   │ RCCL_QUICKREDUCE_MIN_BYTES (~1    │
+│      │                                   │ MiB).                             │
+│      │                                   │                                   │
+│ F006 │ T1b - Quantized MoE AllToAll      │ Distinct from T1a: AllToAll is a  │
+│      │ dispatch/combine (lossy, separate │ permute/shuffle with NO           │
+│      │ kernel)                           │ reduction, so it does NOT         │
+│      │                                   │ reuse the RS->reduce->AG or       │
+│      │                                   │ ncclSum machinery. Per-token (not │
+│      │                                   │ per-block) scales and             │
+│      │                                   │ asymmetric precision (MoRI-style  │
+│      │                                   │ MXFP4 dispatch / FP8 combine).    │
+│      │                                   │ New kernel under                  │
+│      │                                   │ src/device/ +                     │
+│      │                                   │ src/include/algorithms/alltoall/, │
+│      │                                   │ dispatched in src/collectives.cc  │
+│      │                                   │ alongside the existing Pivot      │
+│      │                                   │ AllToAll path; share the          │
+│      │                                   │ symmetric codec from T1a where    │
+│      │                                   │ applicable, extended for          │
+│      │                                   │ per-token scales. Gate:           │
+│      │                                   │ RCCL_QUANT_ALLTOALL_ENABLE        │
+│      │                                   │ (default 0). Intra-node MoE       │
+│      │                                   │ token-sized messages only; the    │
+│      │                                   │ inter-node RDMA path is           │
+│      │                                   │ out of scope.                     │
+│      │                                   │                                   │
+│ F007 │ T4 - Log-round                    │ Low priority - the audit rates    │
+│      │ recursive-halving/circulant RS +  │ single-node value modest (at p=8  │
+│      │ AllReduce (lossless, low          │ the double-binary                 │
+│      │ priority)                         │ tree is already competitive);     │
+│      │                                   │ implement and MEASURE honestly, a │
+│      │                                   │ flat/small result is              │
+│      │                                   │ an acceptable recordable outcome, │
+│      │                                   │ do not force-enable. ceil(log2    │
+│      │                                   │ p)-round reduce-                  │
+│      │                                   │ scatter (p=8 -> 3 rounds vs       │
+│      │                                   │ ring's 7) at p-1 volume;          │
+│      │                                   │ AllReduce = RS + reversed AG.     │
+│      │                                   │ Add an RCCL-local algorithm id    │
+│      │                                   │ (extend the RCCL_DIRECT_ALLGATHER │
+│      │                                   │ = NCCL_NUM_ALGORITHMS             │
+│      │                                   │ pattern at                        │
+│      │                                   │ src/include/rccl_common.h:63) to  │
+│      │                                   │ avoid perturbing the NCCL enum;   │
+│      │                                   │ new kernel                        │
+│      │                                   │ src/dda_recursive_halving_ipc.cu  │
+│      │                                   │ + .../reduce_scatter/rhd_dda.h    │
+│      │                                   │ reusing IpcGpuBarrier             │
+│      │                                   │ and CollCommon.h; dispatch in     │
+│      │                                   │ src/collectives.cc (RS :576, AR   │
+│      │                                   │ :440); add a log-p                │
+│      │                                   │ latCount term at                  │
+│      │                                   │ src/graph/tuning.cc:1147 so the   │
+│      │                                   │ selector prefers it in the        │
+│      │                                   │ sync-bound                        │
+│      │                                   │ medium band. Gate:                │
+│      │                                   │ RCCL_RHD_ENABLE (default 0).      │
+│      │                                   │ Lossless (bit-exact).             │
+│      │                                   │                                   │
+│ F008 │ Consolidated before/after impact  │ Aggregate the per-target          │
+│      │ report                            │ before/after tables into one      │
+│      │                                   │ summary comparing the F001        │
+│      │                                   │ baseline against each target's    │
+│      │                                   │ gate-ON result across the shared  │
+│      │                                   │ AllReduce sweep (and              │
+│      │                                   │ each target's own collective),    │
+│      │                                   │ for both gfx942 and gfx950.       │
+│      │                                   │ Include per-target verdict        │
+│      │                                   │ (PASS/FAIL vs its threshold), the │
+│      │                                   │ crossover/regime where each       │
+│      │                                   │ helps, correctness                │
+│      │                                   │ (bit-exact vs measured rel-err),  │
+│      │                                   │ and a one-line recommendation on  │
+│      │                                   │ default posture                   │
+│      │                                   │ (all remain off by default; note  │
+│      │                                   │ which are worth promoting behind  │
+│      │                                   │ auto-selection for                │
+│      │                                   │ their regime). This is the        │
+│      │                                   │ deliverable that shows the        │
+│      │                                   │ measured impact of the changes.   │
+│      │                                   │                                   │
+└──────┴───────────────────────────────────┴───────────────────────────────────┘
+[2026-07-07 20:50:38] [INFO] [cli] Spec hash computed: bf45a763ed8e
+[2026-07-07 20:50:38] [INFO] [cli] Stored spec hash on project 56766e14-4741-4ab0-9cd0-0c16e6d99434
+spec_quality_score: tools/spec_quality_score.py not found — skipping composite 
+gate
+Created 9 features in database.
+[2026-07-07 20:50:38] [INFO] [cli] Created 9 features from spec

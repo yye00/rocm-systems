@@ -1,0 +1,16 @@
+Generating topology using 59:  8gfx950 1H7XGMI  8NIC 2AMD   A
+nnodes = 1, nranks = 8
+Loading topology file /home/yelkhamr/dark-factory/rocm-systems/projects/rccl/tools/topo_expl/models/topo_8p_950.xml
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+localHostHash = 0x0 not found in the list of system hostHashes
+Rank 0 is on host 0
+Rank 1 is on host 0
+Rank 2 is on host 0
+Rank 3 is on host 0
+Error: Failed to create topology explorer context

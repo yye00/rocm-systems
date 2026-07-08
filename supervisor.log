@@ -1,0 +1,22 @@
+unparked_blockers=0
+[supervisor] iter=1 completed=0 runnable=1 20:20:12
+unparked_blockers=0
+[supervisor] iter=1 completed=0 runnable=1 20:53:00
+/home/yelkhamr/dark-factory/rocm-systems/bob_supervisor.sh: line 44: 3668101 Killed                  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+[supervisor] bob exited=137 completed_after=1 20:56:54
+unparked_blockers=0
+[supervisor] iter=2 completed=1 runnable=1 20:56:59
+/home/yelkhamr/dark-factory/rocm-systems/bob_supervisor.sh: line 44: 3756174 Killed                  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+[supervisor] bob exited=137 completed_after=1 21:01:39
+unparked_blockers=0
+[supervisor] iter=3 completed=1 runnable=1 21:01:44
+/home/yelkhamr/dark-factory/rocm-systems/bob_supervisor.sh: line 44: 3852173 Killed                  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+[supervisor] bob exited=137 completed_after=1 21:40:39
+unparked_blockers=0
+[supervisor] iter=4 completed=1 runnable=1 21:40:44
+/home/yelkhamr/dark-factory/rocm-systems/bob_supervisor.sh: line 44: 225879 Killed                  $BOB run --all --max-concurrent-features 32 < /dev/null >> /home/yelkhamr/dark-factory/rocm-systems/build.log 2>&1
+[supervisor] bob exited=137 completed_after=1 22:06:31
+unparked_blockers=0
+[supervisor] iter=5 completed=1 runnable=1 22:06:36
+unparked_blockers=0
+[supervisor] iter=1 completed=2 runnable=1 22:09:08

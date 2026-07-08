@@ -1,0 +1,11 @@
+>>> allreduce_half.txt : /home/yelkhamr/dark-factory/rocm-systems/projects/rccl-tests/build/all_reduce_perf -d half
+    exit=0 wrong=Out of bounds values : 0
+>>> allreduce_bfloat16.txt : /home/yelkhamr/dark-factory/rocm-systems/projects/rccl-tests/build/all_reduce_perf -d bfloat16
+    exit=0 wrong=Out of bounds values : 0
+>>> reducescatter_half.txt : /home/yelkhamr/dark-factory/rocm-systems/projects/rccl-tests/build/reduce_scatter_perf -d half
+    exit=0 wrong=Out of bounds values : 0
+>>> allgather_half.txt : /home/yelkhamr/dark-factory/rocm-systems/projects/rccl-tests/build/all_gather_perf -d half
+    exit=0 wrong=Out of bounds values : 0
+>>> alltoall_half.txt : /home/yelkhamr/dark-factory/rocm-systems/projects/rccl-tests/build/alltoall_perf -d half
+    exit=0 wrong=Out of bounds values : 0
+ALL SWEEPS DONE

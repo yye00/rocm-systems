@@ -1,0 +1,42 @@
+-- The CXX compiler identification is Clang 20.0.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/rocm/bin/amdclang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found GTest: /usr/local/lib/cmake/GTest/GTestConfig.cmake (found suitable version "1.14.0", minimum required is "1.11")  
+CMake Deprecation Warning at /opt/rocm/share/rocm/cmake/ROCMConfig.cmake:12 (message):
+  Use of find_package(ROCM) is deprecated as of ROCm 6.4.  Please use
+  find_package(ROCmCMakeBuildTools)
+Call Stack (most recent call first):
+  cmake/Dependencies.cmake:84 (find_package)
+  CMakeLists.txt:137 (include)
+
+
+-- fmt not found, fetching from source...
+[ 11%] Creating directories for 'fmt-populate'
+[ 22%] Performing download step (git clone) for 'fmt-populate'
+Cloning into 'fmt-src'...
+fatal: could not open '/home/yelkhamr/dark-factory/rocm-systems/projects/rccl/build/release/_deps/fmt-src/.git/objects/pack/tmp_pack_85mu56' for reading: No such file or directory
+fatal: fetch-pack: invalid index-pack output
+-- Had to git clone more than once: 3 times.
+CMake Error at fmt-subbuild/fmt-populate-prefix/tmp/fmt-populate-gitclone.cmake:39 (message):
+  Failed to clone repository: 'https://github.com/fmtlib/fmt'
+
+
+gmake[2]: *** [CMakeFiles/fmt-populate.dir/build.make:102: fmt-populate-prefix/src/fmt-populate-stamp/fmt-populate-download] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:83: CMakeFiles/fmt-populate.dir/all] Error 2
+gmake: *** [Makefile:91: all] Error 2
+
+CMake Error at /usr/local/share/cmake-3.25/Modules/FetchContent.cmake:1624 (message):
+  Build step for fmt failed: 2
+Call Stack (most recent call first):
+  /usr/local/share/cmake-3.25/Modules/FetchContent.cmake:1764:EVAL:2 (__FetchContent_directPopulate)
+  /usr/local/share/cmake-3.25/Modules/FetchContent.cmake:1764 (cmake_language)
+  /usr/local/share/cmake-3.25/Modules/FetchContent.cmake:1978 (FetchContent_Populate)
+  cmake/Dependencies.cmake:129 (FetchContent_MakeAvailable)
+  CMakeLists.txt:137 (include)
+
+
+-- Configuring incomplete, errors occurred!
+See also "/home/yelkhamr/dark-factory/rocm-systems/projects/rccl/build/release/CMakeFiles/CMakeOutput.log".

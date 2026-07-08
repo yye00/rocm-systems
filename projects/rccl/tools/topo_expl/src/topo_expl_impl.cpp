@@ -228,6 +228,19 @@ ncclResult_t ncclTopoGetSystem(const char* xmlTopoFile, struct ncclTopoSystem** 
   struct ncclXml* xml;
   NCCLCHECK(xmlAlloc(&xml, NCCL_GRAPH_XML_MAX_NODES));
   NCCLCHECK(ncclTopoGetXmlFromFile(xmlTopoFile, xml, 0));
+  // Model XML files may carry a real host_hash captured from the machine that
+  // dumped them (via NCCL_TOPO_DUMP_FILE). Real RCCL never preserves those:
+  // ncclTopoGetSystem() overwrites every cpu node's host_hash after reading the
+  // file. topo_expl simulates a single host and looks the topology up with
+  // localHostHash=0, so a preserved non-zero host_hash makes that lookup fail
+  // once a second numa node is reached. Reset every cpu node's host_hash to 0
+  // to match, matching the fixtures that omit the attribute.
+  struct ncclXmlNode* cpuNode;
+  NCCLCHECK(xmlFindTag(xml, "cpu", &cpuNode));
+  while (cpuNode != nullptr) {
+    NCCLCHECK(xmlSetAttrLong(cpuNode, "host_hash", 0));
+    NCCLCHECK(xmlFindNextTag(xml, "cpu", cpuNode, &cpuNode));
+  }
   NCCLCHECK(ncclTopoGetSystemFromXml(xml, system, 0));
   free(xml);
   return ncclSuccess;

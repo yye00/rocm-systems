@@ -1,0 +1,78 @@
+rm -rf third_party/fmt
+rm -rf hipify_rccl
+make: *** No rule to make target 'hipify_rccl/graph/topo.cc', needed by 'topo_expl'.  Stop.
+make: *** Waiting for unfinished jobs....
+mkdir -p hipify_rccl/src/device/include hipify_rccl/include/network/unpack hipify_rccl/device/symmetric include/rccl
+>>> fmt not found; cloning https://github.com/fmtlib/fmt.git ...
+# Copy nccl.h.in from rccl source to always get latest API definitions
+cp -a ../../src/nccl.h.in include/nccl.h
+Cloning into 'third_party/fmt'...
+# Also copy to rccl/rccl.h for files that use #include <rccl/rccl.h>
+cp -a ../../src/nccl.h.in include/rccl/rccl.h
+cp -a ../../src/include/ hipify_rccl/
+cp -a ../../src/graph/ hipify_rccl/
+cp -a ../../src/device/*.h hipify_rccl/src/device/include
+cp -a ../../src/device/network/unpack/*.h hipify_rccl/include/network/unpack
+# src/include/sym_kernels.h includes "../device/symmetric/gin_scratch.h"
+# (relative path), so mirror those headers under hipify_rccl/device/symmetric/.
+cp -a ../../src/device/symmetric/*.h hipify_rccl/device/symmetric/
+cp -a ../../src/enqueue.cc hipify_rccl/
+cp -a ../../src/register/register.cc hipify_rccl/
+cp -a ../../src/collectives.cc hipify_rccl/
+cp -a ../../src/misc/archinfo.cc hipify_rccl/graph/
+# Hipify all header and source files (CUDA -> HIP).
+# Walk every subdirectory under hipify_rccl/include/ recursively so that
+# any new subtrees added by future NCCL syncs (e.g. rma/, gin/, ionic/,
+# mlx5/, algorithms/, etc.) are covered automatically.
+# nvtx3/ is intentionally excluded because we swap in a stub via PATCH 2.
+>>> Hipifying RCCL header files...
+find hipify_rccl/include -type f -name '*.h' -not -path 'hipify_rccl/include/nvtx3/*' \
+    -exec /opt/rocm/bin/hipify-perl -inplace -quiet-warnings {} +
+/opt/rocm/bin/hipify-perl -inplace -quiet-warnings hipify_rccl/src/device/include/*.h
+# PATCH 1: Fix device includes - remove "device/" prefix since files are in same directory
+sed -i 's|#include "device/|#include "|g' hipify_rccl/src/device/include/*.h
+sed -i 's|#include "device/|#include "|g' hipify_rccl/include/*.h
+sed -i 's|#include "device/|#include "|g' hipify_rccl/*.cc
+# PATCH 2: Use NVTX stubs - topo_expl doesn't need full NVTX implementation
+cp hipify_rccl/include/nvtx_stub.h hipify_rccl/include/nvtx.h
+bash ../../cmake/scripts/add_unroll.sh "hipify_rccl/src/device/include/common.h"
+>>> Hipifying RCCL source files...
+/opt/rocm/bin/hipify-perl -inplace -quiet-warnings hipify_rccl/graph/*
+/opt/rocm/bin/hipify-perl -inplace -quiet-warnings hipify_rccl/include/network/unpack/*
+/opt/rocm/bin/hipify-perl -inplace -quiet-warnings hipify_rccl/*.cc
+# PATCH 3: Generate *_tmp.h files - these are build-time generated headers in rccl
+cp hipify_rccl/include/nccl_device/core.h hipify_rccl/include/nccl_device/core_tmp.h
+cp hipify_rccl/include/nccl_device/comm.h hipify_rccl/include/nccl_device/comm_tmp.h
+cp hipify_rccl/include/nccl_device/gin.h hipify_rccl/include/nccl_device/gin_tmp.h
+# PATCH 3b: The param/ headers (param.h, common.h, utils.h) collide in basename
+# with include/{param,utils}.h and device/common.h, so the main RCCL build's
+# add_file_unique() renames the staged copies to *_tmp.h. Sources reference the
+# _tmp names (see src/include/param/param.h), so mirror those staged names here.
+cp hipify_rccl/include/param/param.h hipify_rccl/include/param/param_tmp.h
+cp hipify_rccl/include/param/common.h hipify_rccl/include/param/common_tmp.h
+cp hipify_rccl/include/param/utils.h hipify_rccl/include/param/utils_tmp.h
+# PATCH 4: Add missing NVTX stub macros for topo_expl build
+echo '#define NCCL_NVTX3_FUNC_RANGE do {} while(0)' >> hipify_rccl/include/nvtx.h
+echo 'inline void initNvtxRegisteredEnums() {}' >> hipify_rccl/include/nvtx.h
+# PATCH 5: Add nccl_tuner.h include to get NCCL_NUM_ALGORITHMS and NCCL_NUM_PROTOCOLS macros
+sed -i '/#include "core.h"/a #include "plugin/nccl_tuner.h"' hipify_rccl/include/rccl_common.h
+# PATCH 7: hipify-perl rewrites __CUDACC__ -> __HIPCC__ in nccl_device/*.h.
+# Restore the original __CUDACC__ guard so device-only blocks are skipped
+# on the topo_expl host pass (no -x hip device compile here). This keeps
+# caller-side guards aligned with the device-API *declarations* in
+# nccl_device/core.h that are also gated on __CUDACC__.
+find hipify_rccl/include/nccl_device -type f -name '*.h' \
+    -exec sed -i 's|__HIPCC__|__CUDACC__|g' {} +
+# PATCH 7b: nccl_device/hip_compat.h binds NCCL_CHECK_CUDACC to
+# NCCL_DEVICE_COMPILE, which is true under defined(__HIP_PLATFORM_AMD__)
+# on both host and device passes. Without this patch, callers under
+# `#if NCCL_CHECK_CUDACC` (e.g. gin_scratch__types.h, ll_a2a__funcs.h,
+# barrier__funcs.h) would reference device-API declarations from
+# nccl_device/core.h that were skipped by PATCH 7's __CUDACC__ guard,
+# producing 'undeclared identifier' errors. Force NCCL_CHECK_CUDACC to
+# track __CUDACC__ so both sides are uniformly skipped on the host build.
+sed -i 's|^#define NCCL_CHECK_CUDACC NCCL_DEVICE_COMPILE$|#define NCCL_CHECK_CUDACC __CUDACC__|' \
+    hipify_rccl/include/nccl_device/hip_compat.h
+# PATCH 6: Guard RCCL_EXPOSE_STATIC so -DRCCL_EXPOSE_STATIC from CXXFLAGS does not trigger redefinition warning
+sed -i 's|^#define RCCL_EXPOSE_STATIC \(.*\)|#ifndef RCCL_EXPOSE_STATIC\n#define RCCL_EXPOSE_STATIC \1\n#endif|' hipify_rccl/include/rccl_vars.h
+>>> Hipify complete.

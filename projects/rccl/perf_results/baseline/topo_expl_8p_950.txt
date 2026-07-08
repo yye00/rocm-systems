@@ -1,0 +1,167 @@
+=== topo_expl model 59 (8x gfx950 / MI355X, single-host XGMI clique) ===
+cmd: NCCL_DEBUG=version ./topo_expl -m 59  (from projects/rccl/tools/topo_expl)
+exit code: 0
+
+Generating topology using 59:  8gfx950 1H7XGMI  8NIC 2AMD   A
+nnodes = 1, nranks = 8
+Rank 0 is on host 0
+Rank 1 is on host 0
+Rank 2 is on host 0
+Rank 3 is on host 0
+Rank 4 is on host 0
+Rank 5 is on host 0
+Rank 6 is on host 0
+Rank 7 is on host 0
+Rank 0: node 0 cudaDev 0 GPU busId 8000
+Rank 1: node 0 cudaDev 1 GPU busId 18000
+Rank 2: node 0 cudaDev 2 GPU busId 68000
+Rank 3: node 0 cudaDev 3 GPU busId 78000
+Rank 4: node 0 cudaDev 4 GPU busId 88000
+Rank 5: node 0 cudaDev 5 GPU busId 98000
+Rank 6: node 0 cudaDev 6 GPU busId e8000
+Rank 7: node 0 cudaDev 7 GPU busId f9000
+
+Running fp32 production choices for algorithm/protocol/maxChannels
+| Max Size(B)     | Count           | Collective      | Algorithm  | Protocol   | Max Channels |
+|-----------------|-----------------|-----------------|------------|------------|--------------|
+| 32              | 8               | AllReduce       | Ring       | LL         | 1            |
+| 64              | 16              | AllReduce       | Tree       | LL         | 1            |
+| 128             | 32              | AllReduce       | Tree       | LL         | 1            |
+| 256             | 64              | AllReduce       | Tree       | LL         | 1            |
+| 512             | 128             | AllReduce       | Tree       | LL         | 1            |
+| 1024            | 256             | AllReduce       | Tree       | LL         | 1            |
+| 2048            | 512             | AllReduce       | Tree       | LL         | 1            |
+| 4096            | 1024            | AllReduce       | Tree       | LL         | 1            |
+| 8192            | 2048            | AllReduce       | Tree       | LL         | 1            |
+| 16384           | 4096            | AllReduce       | Tree       | LL         | 1            |
+| 32768           | 8192            | AllReduce       | Tree       | LL         | 2            |
+| 65536           | 16384           | AllReduce       | Tree       | LL         | 4            |
+| 131072          | 32768           | AllReduce       | Tree       | LL         | 8            |
+| 262144          | 65536           | AllReduce       | Tree       | LL         | 16           |
+| 524288          | 131072          | AllReduce       | Ring       | Simple     | 32           |
+| 1048576         | 262144          | AllReduce       | Ring       | Simple     | 56           |
+| 2097152         | 524288          | AllReduce       | Ring       | Simple     | 56           |
+| 4194304         | 1048576         | AllReduce       | Ring       | Simple     | 56           |
+| 8388608         | 2097152         | AllReduce       | Ring       | Simple     | 56           |
+| 16777216        | 4194304         | AllReduce       | Ring       | Simple     | 56           |
+| 33554432        | 8388608         | AllReduce       | Ring       | Simple     | 56           |
+| 67108864        | 16777216        | AllReduce       | Ring       | Simple     | 56           |
+| 134217728       | 33554432        | AllReduce       | Ring       | Simple     | 56           |
+| 268435456       | 67108864        | AllReduce       | Ring       | Simple     | 56           |
+| 536870912       | 134217728       | AllReduce       | Ring       | Simple     | 56           |
+| 1073741824      | 268435456       | AllReduce       | Ring       | Simple     | 56           |
+| 2147483648      | 536870912       | AllReduce       | Ring       | Simple     | 56           |
+| 4294967296      | 1073741824      | AllReduce       | Ring       | Simple     | 56           |
+| 256             | 8               | AllGather       | Ring       | LL         | 1            |
+| 512             | 16              | AllGather       | Ring       | LL         | 1            |
+| 1024            | 32              | AllGather       | Ring       | LL         | 1            |
+| 2048            | 64              | AllGather       | Ring       | LL         | 1            |
+| 4096            | 128             | AllGather       | Ring       | LL         | 1            |
+| 8192            | 256             | AllGather       | Ring       | LL         | 1            |
+| 16384           | 512             | AllGather       | Ring       | LL         | 1            |
+| 32768           | 1024            | AllGather       | Ring       | LL         | 2            |
+| 65536           | 2048            | AllGather       | Ring       | LL         | 4            |
+| 131072          | 4096            | AllGather       | Ring       | LL         | 8            |
+| 262144          | 8192            | AllGather       | Ring       | LL         | 16           |
+| 524288          | 16384           | AllGather       | Ring       | LL         | 32           |
+| 1048576         | 32768           | AllGather       | Ring       | Simple     | 56           |
+| 2097152         | 65536           | AllGather       | Ring       | Simple     | 56           |
+| 4194304         | 131072          | AllGather       | Ring       | Simple     | 56           |
+| 8388608         | 262144          | AllGather       | Ring       | Simple     | 56           |
+| 16777216        | 524288          | AllGather       | Ring       | Simple     | 56           |
+| 33554432        | 1048576         | AllGather       | Ring       | Simple     | 56           |
+| 67108864        | 2097152         | AllGather       | Ring       | Simple     | 56           |
+| 134217728       | 4194304         | AllGather       | Ring       | Simple     | 56           |
+| 268435456       | 8388608         | AllGather       | Ring       | Simple     | 56           |
+| 536870912       | 16777216        | AllGather       | Ring       | Simple     | 56           |
+| 1073741824      | 33554432        | AllGather       | Ring       | Simple     | 56           |
+| 2147483648      | 67108864        | AllGather       | Ring       | Simple     | 56           |
+| 4294967296      | 134217728       | AllGather       | Ring       | Simple     | 56           |
+| 8589934592      | 268435456       | AllGather       | Ring       | Simple     | 56           |
+| 17179869184     | 536870912       | AllGather       | Ring       | Simple     | 56           |
+| 34359738368     | 1073741824      | AllGather       | Ring       | Simple     | 56           |
+| 256             | 8               | ReduceScatter   | Ring       | LL         | 1            |
+| 512             | 16              | ReduceScatter   | Ring       | LL         | 1            |
+| 1024            | 32              | ReduceScatter   | Ring       | LL         | 1            |
+| 2048            | 64              | ReduceScatter   | Ring       | LL         | 1            |
+| 4096            | 128             | ReduceScatter   | Ring       | LL         | 1            |
+| 8192            | 256             | ReduceScatter   | Ring       | LL         | 1            |
+| 16384           | 512             | ReduceScatter   | Ring       | LL         | 1            |
+| 32768           | 1024            | ReduceScatter   | Ring       | LL         | 2            |
+| 65536           | 2048            | ReduceScatter   | Ring       | LL         | 4            |
+| 131072          | 4096            | ReduceScatter   | Ring       | LL         | 8            |
+| 262144          | 8192            | ReduceScatter   | Ring       | LL         | 16           |
+| 524288          | 16384           | ReduceScatter   | Ring       | LL         | 32           |
+| 1048576         | 32768           | ReduceScatter   | Ring       | LL         | 56           |
+| 2097152         | 65536           | ReduceScatter   | Ring       | Simple     | 56           |
+| 4194304         | 131072          | ReduceScatter   | Ring       | Simple     | 56           |
+| 8388608         | 262144          | ReduceScatter   | Ring       | Simple     | 56           |
+| 16777216        | 524288          | ReduceScatter   | Ring       | Simple     | 56           |
+| 33554432        | 1048576         | ReduceScatter   | Ring       | Simple     | 56           |
+| 67108864        | 2097152         | ReduceScatter   | Ring       | Simple     | 56           |
+| 134217728       | 4194304         | ReduceScatter   | Ring       | Simple     | 56           |
+| 268435456       | 8388608         | ReduceScatter   | Ring       | Simple     | 56           |
+| 536870912       | 16777216        | ReduceScatter   | Ring       | Simple     | 56           |
+| 1073741824      | 33554432        | ReduceScatter   | Ring       | Simple     | 56           |
+| 2147483648      | 67108864        | ReduceScatter   | Ring       | Simple     | 56           |
+| 4294967296      | 134217728       | ReduceScatter   | Ring       | Simple     | 56           |
+| 8589934592      | 268435456       | ReduceScatter   | Ring       | Simple     | 56           |
+| 17179869184     | 536870912       | ReduceScatter   | Ring       | Simple     | 56           |
+| 34359738368     | 1073741824      | ReduceScatter   | Ring       | Simple     | 56           |
+| 32              | 8               | Reduce          | Ring       | LL         | 1            |
+| 64              | 16              | Reduce          | Ring       | LL         | 1            |
+| 128             | 32              | Reduce          | Ring       | LL         | 1            |
+| 256             | 64              | Reduce          | Ring       | LL         | 1            |
+| 512             | 128             | Reduce          | Ring       | LL         | 1            |
+| 1024            | 256             | Reduce          | Ring       | LL         | 1            |
+| 2048            | 512             | Reduce          | Ring       | LL         | 1            |
+| 4096            | 1024            | Reduce          | Ring       | LL         | 1            |
+| 8192            | 2048            | Reduce          | Ring       | LL         | 1            |
+| 16384           | 4096            | Reduce          | Ring       | LL         | 1            |
+| 32768           | 8192            | Reduce          | Ring       | LL         | 2            |
+| 65536           | 16384           | Reduce          | Ring       | LL         | 4            |
+| 131072          | 32768           | Reduce          | Ring       | LL         | 8            |
+| 262144          | 65536           | Reduce          | Ring       | LL         | 16           |
+| 524288          | 131072          | Reduce          | Ring       | Simple     | 32           |
+| 1048576         | 262144          | Reduce          | Ring       | Simple     | 56           |
+| 2097152         | 524288          | Reduce          | Ring       | Simple     | 56           |
+| 4194304         | 1048576         | Reduce          | Ring       | Simple     | 56           |
+| 8388608         | 2097152         | Reduce          | Ring       | Simple     | 56           |
+| 16777216        | 4194304         | Reduce          | Ring       | Simple     | 56           |
+| 33554432        | 8388608         | Reduce          | Ring       | Simple     | 56           |
+| 67108864        | 16777216        | Reduce          | Ring       | Simple     | 56           |
+| 134217728       | 33554432        | Reduce          | Ring       | Simple     | 56           |
+| 268435456       | 67108864        | Reduce          | Ring       | Simple     | 56           |
+| 536870912       | 134217728       | Reduce          | Ring       | Simple     | 56           |
+| 1073741824      | 268435456       | Reduce          | Ring       | Simple     | 56           |
+| 2147483648      | 536870912       | Reduce          | Ring       | Simple     | 56           |
+| 4294967296      | 1073741824      | Reduce          | Ring       | Simple     | 56           |
+| 32              | 8               | Broadcast       | Ring       | LL         | 1            |
+| 64              | 16              | Broadcast       | Ring       | LL         | 1            |
+| 128             | 32              | Broadcast       | Ring       | LL         | 1            |
+| 256             | 64              | Broadcast       | Ring       | LL         | 1            |
+| 512             | 128             | Broadcast       | Ring       | LL         | 1            |
+| 1024            | 256             | Broadcast       | Ring       | LL         | 1            |
+| 2048            | 512             | Broadcast       | Ring       | LL         | 1            |
+| 4096            | 1024            | Broadcast       | Ring       | LL         | 1            |
+| 8192            | 2048            | Broadcast       | Ring       | LL         | 1            |
+| 16384           | 4096            | Broadcast       | Ring       | LL         | 1            |
+| 32768           | 8192            | Broadcast       | Ring       | LL         | 2            |
+| 65536           | 16384           | Broadcast       | Ring       | LL         | 4            |
+| 131072          | 32768           | Broadcast       | Ring       | LL         | 8            |
+| 262144          | 65536           | Broadcast       | Ring       | LL         | 16           |
+| 524288          | 131072          | Broadcast       | Ring       | Simple     | 32           |
+| 1048576         | 262144          | Broadcast       | Ring       | Simple     | 56           |
+| 2097152         | 524288          | Broadcast       | Ring       | Simple     | 56           |
+| 4194304         | 1048576         | Broadcast       | Ring       | Simple     | 56           |
+| 8388608         | 2097152         | Broadcast       | Ring       | Simple     | 56           |
+| 16777216        | 4194304         | Broadcast       | Ring       | Simple     | 56           |
+| 33554432        | 8388608         | Broadcast       | Ring       | Simple     | 56           |
+| 67108864        | 16777216        | Broadcast       | Ring       | Simple     | 56           |
+| 134217728       | 33554432        | Broadcast       | Ring       | Simple     | 56           |
+| 268435456       | 67108864        | Broadcast       | Ring       | Simple     | 56           |
+| 536870912       | 134217728       | Broadcast       | Ring       | Simple     | 56           |
+| 1073741824      | 268435456       | Broadcast       | Ring       | Simple     | 56           |
+| 2147483648      | 536870912       | Broadcast       | Ring       | Simple     | 56           |
+| 4294967296      | 1073741824      | Broadcast       | Ring       | Simple     | 56           |
+Done generating topology using 59:  8gfx950 1H7XGMI  8NIC 2AMD   A
