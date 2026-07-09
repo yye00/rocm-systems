@@ -1,0 +1,43 @@
+=== ENVIRONMENT ===
+date(UTC): 2026-07-09T02:04:06Z
+host: smci355-ccs-aus-m03-05
+librccl: 280753072 bytes Jul 8 14:39
+gate symbol embedded: 1 (expect >=1)
+all_reduce_perf_mpi: present
+rocm: /opt/rocm-7.0.1 
+gpus(gfx950): 16
+perf binary links librccl: 	librccl.so.1 => /home/yelkhamr/dark-factory/rocm-systems/projects/rccl/build/release/librccl.so.1 (0x000075227b800000)
+
+=== T3a A/B: gate OFF (ring) vs gate ON (DDA), validation -c 1 (#wrong checked) ===
+  np=2 size=16M relax=0 -> busbw=57.016 GB/s  wrong0_OK=1  raw=ar_np2_16M_relax0.txt
+  np=2 size=16M relax=1 -> busbw=60.6572 GB/s  wrong0_OK=1  raw=ar_np2_16M_relax1.txt
+  np=2 size=64M relax=0 -> busbw=55.7135 GB/s  wrong0_OK=1  raw=ar_np2_64M_relax0.txt
+  np=2 size=64M relax=1 -> busbw=61.5035 GB/s  wrong0_OK=1  raw=ar_np2_64M_relax1.txt
+  np=2 size=256M relax=0 -> busbw=57.119 GB/s  wrong0_OK=1  raw=ar_np2_256M_relax0.txt
+  np=2 size=256M relax=1 -> busbw=57.0875 GB/s  wrong0_OK=1  raw=ar_np2_256M_relax1.txt
+  np=4 size=16M relax=0 -> busbw=154.23 GB/s  wrong0_OK=1  raw=ar_np4_16M_relax0.txt
+  np=4 size=16M relax=1 -> busbw=169.935 GB/s  wrong0_OK=1  raw=ar_np4_16M_relax1.txt
+  np=4 size=64M relax=0 -> busbw=156.36 GB/s  wrong0_OK=1  raw=ar_np4_64M_relax0.txt
+  np=4 size=64M relax=1 -> busbw=176.317 GB/s  wrong0_OK=1  raw=ar_np4_64M_relax1.txt
+  np=4 size=256M relax=0 -> busbw=161.001 GB/s  wrong0_OK=1  raw=ar_np4_256M_relax0.txt
+  np=4 size=256M relax=1 -> busbw=160.968 GB/s  wrong0_OK=1  raw=ar_np4_256M_relax1.txt
+
+=== ENGAGEMENT PROOF (anti-misattribution): DDA inits ONLY when gate=1 ===
+  DDA init lines with gate ON : 4 (expect >0, ideally 1/rank)
+  DDA init lines with gate OFF: 0 (expect 0 — the gate is the only difference)
+
+=== SUMMARY TABLE (busbw GB/s; higher=better; #wrong must be 0) ===
+ranks    size     ring_OFF       dda_ON         speedup   
+2        16M      57.016         60.6572        1.06x     
+2        64M      55.7135        61.5035        1.10x     
+2        256M     57.119         57.0875        1.00x     
+4        16M      154.23         169.935        1.10x     
+4        64M      156.36         176.317        1.13x     
+4        256M     161.001        160.968        1.00x     
+
+=== CORRECTNESS: every run must report 'Out of bounds values : 0 OK' ===
+  runs with #wrong==0: 12 / 12
+
+VERDICT RULE: T3a is CONFIRMED iff (speedup>1.0 at 2 and 4 ranks) AND (all runs #wrong==0)
+             AND (DDA init lines: gate-ON>0, gate-OFF==0).
+Logs in: ./verify_out/
