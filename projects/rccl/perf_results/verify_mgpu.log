@@ -1,0 +1,14 @@
+=== multi-GPU engagement check (date 2026-07-09T02:10:08Z, host smci355-ccs-aus-m03-05) ===
+--- np=2: running AllReduce 64MiB (gate ON, DDA), validation -c 1 ---
+    busbw=61.5443 GB/s  #wrong0_OK=1  ->  8 GPUs active: [0,1,2,3,4,5,6,7]
+    peak per-GPU: g0=86 g1=21 g2=21 g3=86 g4=23 g5=23 g6=23 g7=23 
+--- np=4: running AllReduce 64MiB (gate ON, DDA), validation -c 1 ---
+    busbw=176.315 GB/s  #wrong0_OK=1  ->  8 GPUs active: [0,1,2,3,4,5,6,7]
+    peak per-GPU: g0=59 g1=58 g2=64 g3=56 g4=67 g5=69 g6=67 g7=67 
+--- np=8: running AllReduce 64MiB (gate ON, DDA), validation -c 1 ---
+    busbw=379.59 GB/s  #wrong0_OK=1  ->  8 GPUs active: [0,1,2,3,4,5,6,7]
+    peak per-GPU: g0=67 g1=66 g2=69 g3=64 g4=63 g5=72 g6=63 g7=65 
+
+EXPECTATION: np=2 -> 2 distinct GPUs active; np=4 -> 4; np=8 -> 8.
+If any run shows only 1 GPU active, that is a RED FLAG (not really collective).
+Logs: ./verify_mgpu_out/
