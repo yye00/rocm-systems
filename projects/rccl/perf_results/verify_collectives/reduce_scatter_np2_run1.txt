@@ -1,0 +1,18 @@
+# rccl-tests version 2.18.3-develop:12b92a8ca6 rccl-headers=23004 rccl-library=23004
+# Collective test starting: reduce_scatter_perf_mpi
+# nThread 1 nGpus 1 minBytes 67108864 maxBytes 67108864 step: 2(factor) warmup iters: 20 iters: 80 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 3525048 on smci355-ccs-aus-m03-05 device  0 [0000:75:00] AMD Instinct MI355X
+#  Rank  1 Group  0 Pid 3525067 on smci355-ccs-aus-m03-05 device  1 [0000:05:00] AMD Instinct MI355X
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong  
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)          
+    67108864       8388608     float     sum      -1   618.78  108.45   54.23       0   609.47  110.11   55.06       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 54.6408 
+#
+# Collective test concluded: reduce_scatter_perf_mpi
+#
+

@@ -1,0 +1,20 @@
+# rccl-tests version 2.18.3-develop:12b92a8ca6 rccl-headers=23004 rccl-library=23004
+# Collective test starting: broadcast_perf_mpi
+# nThread 1 nGpus 1 minBytes 67108864 maxBytes 67108864 step: 2(factor) warmup iters: 20 iters: 80 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 3537470 on smci355-ccs-aus-m03-05 device  0 [0000:75:00] AMD Instinct MI355X
+#  Rank  1 Group  0 Pid 3537472 on smci355-ccs-aus-m03-05 device  1 [0000:05:00] AMD Instinct MI355X
+#  Rank  2 Group  0 Pid 3537473 on smci355-ccs-aus-m03-05 device  2 [0000:65:00] AMD Instinct MI355X
+#  Rank  3 Group  0 Pid 3537479 on smci355-ccs-aus-m03-05 device  3 [0000:15:00] AMD Instinct MI355X
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong  
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)          
+    67108864      16777216     float    none       0   821.46   81.69   81.69       0   631.05  106.34  106.34       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 94.0193 
+#
+# Collective test concluded: broadcast_perf_mpi
+#
+

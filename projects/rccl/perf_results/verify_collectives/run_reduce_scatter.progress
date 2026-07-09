@@ -1,0 +1,10 @@
+np=2 run=1 rc=0 done
+np=2 run=2 rc=0 done
+np=2 run=3 rc=0 done
+np=4 run=1 rc=0 done
+np=4 run=2 rc=0 done
+np=4 run=3 rc=0 done
+np=8 run=1 rc=0 done
+np=8 run=2 rc=0 done
+np=8 run=3 rc=0 done
+ALL DONE

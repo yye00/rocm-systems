@@ -1,0 +1,24 @@
+# rccl-tests version 2.18.3-develop:12b92a8ca6 rccl-headers=23004 rccl-library=23004
+# Collective test starting: reduce_perf_mpi
+# nThread 1 nGpus 1 minBytes 67108864 maxBytes 67108864 step: 2(factor) warmup iters: 20 iters: 80 agg iters: 1 validation: 1 graph: 0 unalign: 0
+#
+# Using devices
+#  Rank  0 Group  0 Pid 3579898 on smci355-ccs-aus-m03-05 device  0 [0000:75:00] AMD Instinct MI355X
+#  Rank  1 Group  0 Pid 3579904 on smci355-ccs-aus-m03-05 device  1 [0000:05:00] AMD Instinct MI355X
+#  Rank  2 Group  0 Pid 3579909 on smci355-ccs-aus-m03-05 device  2 [0000:65:00] AMD Instinct MI355X
+#  Rank  3 Group  0 Pid 3579916 on smci355-ccs-aus-m03-05 device  3 [0000:15:00] AMD Instinct MI355X
+#  Rank  4 Group  0 Pid 3579922 on smci355-ccs-aus-m03-05 device  4 [0000:f5:00] AMD Instinct MI355X
+#  Rank  5 Group  0 Pid 3579931 on smci355-ccs-aus-m03-05 device  5 [0000:85:00] AMD Instinct MI355X
+#  Rank  6 Group  0 Pid 3579939 on smci355-ccs-aus-m03-05 device  6 [0000:e5:00] AMD Instinct MI355X
+#  Rank  7 Group  0 Pid 3579945 on smci355-ccs-aus-m03-05 device  7 [0000:95:00] AMD Instinct MI355X
+#
+#                                                              out-of-place                       in-place          
+#       size         count      type   redop    root     time   algbw   busbw  #wrong     time   algbw   busbw  #wrong  
+#        (B)    (elements)                               (us)  (GB/s)  (GB/s)             (us)  (GB/s)  (GB/s)          
+    67108864      16777216     float     sum       0   315.76  212.53  212.53       0   313.32  214.19  214.19       0
+# Out of bounds values : 0 OK
+# Avg bus bandwidth    : 213.361 
+#
+# Collective test concluded: reduce_perf_mpi
+#
+
