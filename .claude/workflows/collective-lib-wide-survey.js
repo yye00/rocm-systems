@@ -16,7 +16,13 @@ const cfg = Object.assign({
   priorSurvey: '/home/user/rocm-systems/projects/rccl/RCCL_ALGORITHM_SURVEY_AND_IMPROVEMENTS.md',
   sotaDoc: '/home/user/rocm-systems/projects/rccl/COLLECTIVE_COMM_STATE_OF_THE_ART_2026.md',
   maxCandidates: 14,
+  agentModel: 'opus',
 }, (args && typeof args === 'object') ? args : {})
+
+// Pin every subagent to this model so the funnel's adversarial code cross-check
+// and literature verification run on the intended tier, regardless of what the
+// session model resolved to at launch time. Override via args.agentModel.
+const MODEL = cfg.agentModel
 
 const HW_CONTEXT = `Target hardware context: AMD MI300X/MI325X/MI355X nodes (8 GPUs, fully-connected XGMI clique intra-node), inter-node via RDMA NICs (InfiniBand or RoCE/Ultra-Ethernet, often rail-optimized), plus PCIe-only platforms (MI210). NVIDIA-only features (NVLS multimem, TMA, C2C) are inert on AMD.`
 
@@ -120,8 +126,8 @@ const litThemes = [
 ]
 
 const surveyResults = await parallel([
-  ...invAreas.map(a => () => agent(a.prompt, { label: `inv:${a.key}`, phase: 'Survey', schema: INV_SCHEMA })),
-  ...litThemes.map(t => () => agent(t.prompt, { label: `lit:${t.key}`, phase: 'Survey', schema: CAND_SCHEMA })),
+  ...invAreas.map(a => () => agent(a.prompt, { label: `inv:${a.key}`, phase: 'Survey', schema: INV_SCHEMA, model: MODEL })),
+  ...litThemes.map(t => () => agent(t.prompt, { label: `lit:${t.key}`, phase: 'Survey', schema: CAND_SCHEMA, model: MODEL })),
 ])
 
 const inv = {}
@@ -144,7 +150,7 @@ ${PRIOR_COVERED}
 ${invSummary}
 
 (B) RAW CANDIDATES (JSON):
-${JSON.stringify(allCandidates)}`, { label: 'gate1:screen', phase: 'Screen', schema: SCREEN_SCHEMA })
+${JSON.stringify(allCandidates)}`, { label: 'gate1:screen', phase: 'Screen', schema: SCREEN_SCHEMA, model: MODEL })
 
 const screened = (screen && screen.screened ? screen.screened : []).sort((a, b) => a.priority - b.priority).slice(0, cfg.maxCandidates)
 log(`Gate 1: ${screened.length} candidates advance (${(screen && screen.dropped || []).length} dropped)`)
@@ -154,14 +160,14 @@ const checked = await pipeline(
   screened,
   (c) => agent(`CODE-CHECK GATE. Candidate technique: "${c.name}" (${c.source}). Mechanism: ${c.mechanism}. Claim: ${c.claim}.
 
-Determine whether ${cfg.component} at ${cfg.repoPath} ALREADY implements this technique (or a functional equivalent), partially implements it, or lacks it. Search the source (src/device, src/graph, src/include/algorithms, src/gin, src/rma, src/nccl_device, src/scheduler, src/, CHANGELOG.md) and cite file:line evidence for whatever you conclude. 'partial' means a related mechanism exists but misses the core of the technique — explain exactly what is missing. In 'notes', name the nearest existing mechanism and the natural extension/integration point. Be adversarial toward the assumption that it is missing: hunt for equivalents under different names. ${HW_CONTEXT}`, { label: `check:${c.name.slice(0, 28)}`, phase: 'CodeCheck', schema: CHECK_SCHEMA })
+Determine whether ${cfg.component} at ${cfg.repoPath} ALREADY implements this technique (or a functional equivalent), partially implements it, or lacks it. Search the source (src/device, src/graph, src/include/algorithms, src/gin, src/rma, src/nccl_device, src/scheduler, src/, CHANGELOG.md) and cite file:line evidence for whatever you conclude. 'partial' means a related mechanism exists but misses the core of the technique — explain exactly what is missing. In 'notes', name the nearest existing mechanism and the natural extension/integration point. Be adversarial toward the assumption that it is missing: hunt for equivalents under different names. ${HW_CONTEXT}`, { label: `check:${c.name.slice(0, 28)}`, phase: 'CodeCheck', schema: CHECK_SCHEMA, model: MODEL })
     .then(chk => ({ ...c, check: chk })),
   (c) => {
     if (!c || !c.check) return null
     if (c.check.status === 'present') { return { ...c, verdict: { survives: false, reason: 'already implemented' } } }
     return parallel([
-      () => agent(`ADVERSARIAL VERIFIER — literature-validity lens. Try to REFUTE this claim using WebSearch/WebFetch against the actual paper/source: "${c.name}" (${c.source}): ${c.claim}. Mechanism: ${c.mechanism}. Check: do the numbers match the paper? Is the baseline really NCCL/RCCL (not MPI)? Is the hardware relevant (GPU cluster, ideally AMD)? Is it peer-reviewed or at least reproducibly documented? Set refuted=true if the claim materially misstates the source or the evidence is simulation-only/vaporware. Record any number/baseline corrections in 'corrections'.`, { label: `verify-lit:${c.name.slice(0, 22)}`, phase: 'Verify', schema: VERDICT_SCHEMA }),
-      () => agent(`ADVERSARIAL VERIFIER — applicability lens. Try to REFUTE that "${c.name}" (${c.mechanism}) would deliver a real performance win if added to ${cfg.component}. Known in-code status: ${c.check.status}; evidence: ${c.check.evidence}; nearest mechanism: ${c.check.notes || 'n/a'}. ${HW_CONTEXT} Consider: does an existing RCCL path already capture most of the benefit (e.g. double-binary tree, DDA, multi-channel full-duplex rings)? Does the technique depend on NVIDIA-only hardware (multimem/NVLS, TMA, NVSwitch) with no AMD analogue? Is its winning regime one AMD customers actually hit? You may read the code at ${cfg.repoPath}. Set refuted=true only with a concrete argument.`, { label: `verify-app:${c.name.slice(0, 22)}`, phase: 'Verify', schema: VERDICT_SCHEMA }),
+      () => agent(`ADVERSARIAL VERIFIER — literature-validity lens. Try to REFUTE this claim using WebSearch/WebFetch against the actual paper/source: "${c.name}" (${c.source}): ${c.claim}. Mechanism: ${c.mechanism}. Check: do the numbers match the paper? Is the baseline really NCCL/RCCL (not MPI)? Is the hardware relevant (GPU cluster, ideally AMD)? Is it peer-reviewed or at least reproducibly documented? Set refuted=true if the claim materially misstates the source or the evidence is simulation-only/vaporware. Record any number/baseline corrections in 'corrections'.`, { label: `verify-lit:${c.name.slice(0, 22)}`, phase: 'Verify', schema: VERDICT_SCHEMA, model: MODEL }),
+      () => agent(`ADVERSARIAL VERIFIER — applicability lens. Try to REFUTE that "${c.name}" (${c.mechanism}) would deliver a real performance win if added to ${cfg.component}. Known in-code status: ${c.check.status}; evidence: ${c.check.evidence}; nearest mechanism: ${c.check.notes || 'n/a'}. ${HW_CONTEXT} Consider: does an existing RCCL path already capture most of the benefit (e.g. double-binary tree, DDA, multi-channel full-duplex rings)? Does the technique depend on NVIDIA-only hardware (multimem/NVLS, TMA, NVSwitch) with no AMD analogue? Is its winning regime one AMD customers actually hit? You may read the code at ${cfg.repoPath}. Set refuted=true only with a concrete argument.`, { label: `verify-app:${c.name.slice(0, 22)}`, phase: 'Verify', schema: VERDICT_SCHEMA, model: MODEL }),
     ]).then(vs => {
       const [lit, app] = vs
       const refutes = vs.filter(Boolean).filter(v => v.refuted).length
@@ -181,6 +187,6 @@ const critic = await agent(`COMPLETENESS CRITIC for a wide-search funnel over ${
 
 CONFIRMED: ${JSON.stringify(confirmed.map(c => ({ name: c.name, source: c.source, claim: c.claim, status: c.check && c.check.status, litConf: c.litVerdict && c.litVerdict.confidence, corrections: c.litVerdict && c.litVerdict.corrections })))}
 REJECTED (with reasons): ${JSON.stringify(rejected.map(c => ({ name: c.name, reason: c.verdict.reason })))}
-INVENTORY SURPRISES: ${JSON.stringify(Object.entries(inv).map(([k, v]) => v && v.surprises))}`, { label: 'critic', phase: 'Critic', schema: CRITIC_SCHEMA })
+INVENTORY SURPRISES: ${JSON.stringify(Object.entries(inv).map(([k, v]) => v && v.surprises))}`, { label: 'critic', phase: 'Critic', schema: CRITIC_SCHEMA, model: MODEL })
 
 return { inventory: inv, screenedCount: screened.length, confirmed, rejected, dropped: screen && screen.dropped, critic }
